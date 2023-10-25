@@ -4,7 +4,7 @@ module ProjectsApi
   # optimize: split the class into several by "GET", "POST", etc.
   class Projects
     include SetHeaders
-    include SetBodys
+    include SetBody
 
     attr_accessor :api_endpoint
     attr_accessor :data
@@ -35,7 +35,8 @@ module ProjectsApi
     end
 
     def create_project
-      options = { :headers => set_body_headers, :body => set_bodys }
+      # options = { :headers => set_body_headers, :body => set_bodys }
+      options = { :headers => set_body_headers, :body => set_body.to_json }
       puts options
       response = HTTParty.post(@api_endpoint, options)
       # should be successful, but ...
@@ -43,11 +44,11 @@ module ProjectsApi
       # pp @errors
 
       pp response
-      @data = response.parsed_response["data"]
-      # puts @result
-      @data.each do |hash|
-        puts hash["id"] + " " + hash["type"]
-      end
+      # @data = response.parsed_response["data"]
+      # # puts @result
+      # @data.each do |hash|
+      #   puts hash["id"] + " " + hash["type"]
+      # end
     end
 
     def update_project
