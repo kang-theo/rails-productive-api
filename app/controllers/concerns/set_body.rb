@@ -14,26 +14,26 @@ def create_body
   "data": {
     "type": "projects",
     "attributes": {
-      "name": "post_proj3",
+      "name": "post_proj1",
       "project_type_id": 2
     },
     "relationships": {
       "company": {
         "data": {
           "type": "companies",
-          "id": "596918"
+          "id": "602830"
         }
       },
       "project_manager": {
         "data": {
           "type": "people",
-          "id": "515687"
+          "id": "521440"
         }
       },
       "workflow": {
         "data": {
           "type": "workflows",
-          "id": "31524"
+          "id": "31589"
         }
       }
     }

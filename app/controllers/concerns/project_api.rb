@@ -22,7 +22,7 @@ module ProjectApi
     end
 
     # should be class method, because it is related to all the records
-    def self.all 
+    def all 
       response = HTTParty.get("https://api.productive.io/api/v2/projects", :headers => set_auth_headers)
       @data = response.parsed_response["data"]
       @data.each do |hash|
@@ -52,12 +52,12 @@ module ProjectApi
 
     def one (id)
       url = "https://api.productive.io/api/v2/projects/#{id}"
-      # puts url
+      puts url
 
       # code below appear in multiple places, should be abstracted
       response = HTTParty.get(url, :headers => set_auth_headers)
-      @errors = response.parsed_response["errors"]
-      pp @errors
+      @data = response.parsed_response["data"]
+      pp @data
     end
 
     def create
