@@ -1,5 +1,5 @@
 class Api::V1::ApiTestController < ApplicationController
-  include ProjectsApi
+  include ProjectApi
 
   def test_get_project_by_id 
     # result = get_project_by_id 560
@@ -7,10 +7,12 @@ class Api::V1::ApiTestController < ApplicationController
 
     # puts "headers: " + set_headers.to_s
 
-    @project = ProjectsApi::Projects.new()
-    @project.get_projects
-    # @project.get_project_by_id 566
-    @project.create_project
+    @project = ProjectApi::Project.new()
+    # @project.all
+    # @project.one (566)
+    # @project.create
+    # @project.update (384780)
+    @project.archive (384780)
   end
 
 end
