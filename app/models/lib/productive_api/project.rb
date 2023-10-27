@@ -1,5 +1,6 @@
 # require 'net/http'
 # require 'uri'
+module ProductiveApi
 class Project < ProductiveApi::Base
     attr_accessor :uri
     attr_accessor :data
@@ -16,7 +17,7 @@ class Project < ProductiveApi::Base
 
     # should be class method, because it is related to all the records
     def self.all 
-      response = HTTParty.patch(set_uri("all", nil))
+      response = HTTParty.get(set_uri("all", nil))
       @data = response.parsed_response["data"]
       @data.each do |hash|
         # puts hash["id"] + " " + hash["type"]
@@ -26,13 +27,13 @@ class Project < ProductiveApi::Base
     end
 
     def one (id)
-      response = HTTParty.patch(set_uri(nil, id))
+      response = HTTParty.get(set_uri(nil, id))
       @data = response.parsed_response["data"]
       pp @data
     end
 
     def self.create
-      response = http_post(set_uri("create", nil), set_options(create_body))
+      response =  HTTParty.post(set_uri("create", nil), set_options(create_body))
       # should be successful, but ...
       # @errors = response.parsed_response["errors"]
       # pp @errors
@@ -66,7 +67,7 @@ class Project < ProductiveApi::Base
     end
 
     def copy (id)
-      response = http_post(set_uri("copy", id), set_options(copy_body))
+      response =  HTTParty.patch(set_uri("copy", id), set_options(copy_body))
       @data = response.parsed_response["data"]
       pp @data
     end
@@ -82,3 +83,4 @@ class Project < ProductiveApi::Base
     end
 
   end
+end
