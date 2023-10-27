@@ -1,6 +1,7 @@
 # require 'net/http'
 # require 'uri'
 class Project < ProductiveApi::Base
+    attr_accessor :id
     attr_accessor :data
     attr_accessor :errors
     # attr_accessor :connection
@@ -10,14 +11,10 @@ class Project < ProductiveApi::Base
     # end
 
     #TODO: use model accessing ways to abstract the api
-    @@uri = Base.model_base_uri + "/projects"
+    @@uri = ProductiveApi::Base.model_base_uri + "/projects"
 
-    # the caller can change the endpoint as needed when creating an instance
-    def initialize 
-      # puts super.model_base_uri
-      # @uri = super.model_base_uri + "/projects"
-      # puts uri
-      # @connection = HttpConnection.new("")
+    def initialize(id)
+      @id = id
     end
 
     class << self
@@ -64,12 +61,10 @@ class Project < ProductiveApi::Base
           puts "An error occurred: #{e.message}"
         end
       end
-
     end
 
-    def one (id)
+    def one
       begin
-        puts @@uri
         response = HTTParty.get(Base.set_uri(nil, id, @@uri), Base.set_options(nil))
         @data = response.parsed_response["data"]
         pp @data
@@ -78,10 +73,10 @@ class Project < ProductiveApi::Base
       rescue StandardError => e
         puts "An error occurred: #{e.message}"
       end
-     end
+    end
 
     # do not follow all the apis provided, try to abstract them into several ones used in reality
-    def update (id)
+    def update
       begin
         response = HTTParty.patch(Base.set_uri("update", id, @@uri), Base.set_options(update_body))
         pp response
@@ -92,9 +87,9 @@ class Project < ProductiveApi::Base
       end
     end
 
-    def archive (id)
+    def archive
       begin
-        response = HTTParty.patch(set_uri("archive", id, @@uri), set_options(archive_body))
+        response = HTTParty.patch(Base.set_uri("archive", id, @@uri), Base.set_options(archive_body))
         pp response
       rescue HTTParty::Error
         puts "HTTParty error occurred"
@@ -103,9 +98,9 @@ class Project < ProductiveApi::Base
       end
     end
 
-    def restore (id)
+    def restore
       begin
-        response = HTTParty.patch(set_uri("restore", id, @@uri), set_options(restore_body))
+        response = HTTParty.patch(Base.set_uri("restore", id, @@uri), Base.set_options(restore_body))
         pp response
       rescue HTTParty::Error
         puts "HTTParty error occurred"
@@ -114,9 +109,9 @@ class Project < ProductiveApi::Base
       end
     end
 
-    def delete (id)
+    def delete
       begin
-        response = HTTParty.delete(set_uri("delete", id, @@uri), set_options(delete_body))
+        response = HTTParty.delete(Base.set_uri("delete", id, @@uri), Base.set_options(delete_body))
         pp response
       rescue HTTParty::Error
         puts "HTTParty error occurred"
@@ -125,9 +120,9 @@ class Project < ProductiveApi::Base
       end
     end
 
-    def copy (id)
+    def copy
       begin
-        response =  HTTParty.patch(set_uri("copy", id, @@uri), set_options(copy_body))
+        response =  HTTParty.patch(Base.set_uri("copy", id, @@uri), Base.set_options(copy_body))
         @data = response.parsed_response["data"]
         pp @data
       rescue HTTParty::Error
@@ -146,4 +141,5 @@ class Project < ProductiveApi::Base
     def map_to_workflow_project
 
     end
+
 end

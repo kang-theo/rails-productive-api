@@ -1,4 +1,5 @@
-module ProductiveApi
+# module ProductiveApi
+
   class Base
    @@settings = nil
 
@@ -13,10 +14,6 @@ module ProductiveApi
       end
 
       def set_uri (type, id, base_uri)
-        puts "2-------"
-        puts type
-        puts id
-        puts base_uri
         case type
           when "all", "create"
             base_uri
@@ -135,4 +132,4 @@ module ProductiveApi
       # end
     end
   end
-end
+# end

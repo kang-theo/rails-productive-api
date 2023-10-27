@@ -1,5 +1,3 @@
-# require 'productive_api'
-# require '/Users/theokang/Theo/Git/productive_api/app/models/lib/productive_api'
 class Api::V1::ApiTestController < ApplicationController
   # include ProjectApi
   # include ProductiveApi
@@ -19,7 +17,8 @@ class Api::V1::ApiTestController < ApplicationController
 
 
     # @project = Project.all
-    @project = Project.new.one(385299)
+    # @project = Project.new.one(385299)
+    @project = Project.new(385299).one
   end
 
 end
