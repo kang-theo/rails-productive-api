@@ -1,6 +1,6 @@
 # require 'net/http'
 # require 'uri'
-class Project < ProductiveApi::Base
+class Project < Base
     attr_accessor :data
     attr_accessor :errors
     # attr_accessor :connection
@@ -146,4 +146,5 @@ class Project < ProductiveApi::Base
     def map_to_workflow_project
 
     end
+
 end

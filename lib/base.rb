@@ -1,4 +1,5 @@
-module ProductiveApi
+
+
   class Base
    @@settings = nil
 
@@ -135,4 +136,3 @@ module ProductiveApi
       # end
     end
   end
-end
