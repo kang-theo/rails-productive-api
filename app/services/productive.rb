@@ -10,8 +10,8 @@ class Productive
 
   # Project.find(id)
   def self.find(id)
-    data = get_response_with_id(__method__, id)
-    puts data
+    response = get_response_with_id(__method__, id)
+    print(response)
   end
 
   def self.create
@@ -56,10 +56,14 @@ class Productive
     end
 
     uri= "#{HOST}/#{self.name.downcase().pluralize()}" + path
-    response = HttpClient.get(uri)
-    JSON.parse(response)["data"]
-    # HttpClient.get("#{HOST}/#{self.class.to_s.downcase().pluralize()}", {'headers' => {'Content-Type' =>  'application/vnd.api+json; ext=bulk'}})
-    # puts ActiveSupport::JSON.decode(response)
+    begin
+      response = HttpClient.get(uri)
+      JSON.parse(response)["data"]
+      # HttpClient.get("#{HOST}/#{self.class.to_s.downcase().pluralize()}", {'headers' => {'Content-Type' =>  'application/vnd.api+json; ext=bulk'}})
+      # raise HttpClient::HttpError.new("E001", "HTTP Error")
+    rescue HttpClient::HttpError => e
+      puts "Exception caught: #{e.message}"
+    end
   end
 
   def self.get_response_with_id(method, id)
@@ -73,18 +77,24 @@ class Productive
     end
 
     uri= "#{HOST}/#{self.name.downcase().pluralize()}" + path
-    response = HttpClient.get(uri)
-    JSON.parse(response)["data"]
+
+    begin
+      response = HttpClient.get(uri)
+      JSON.parse(response)["data"]
+    rescue HttpClient::HttpError => e
+      puts "Exception caught: #{e.message}"
+    end
   end
 
   def self.print_all(data)
       data.each do |hash|
-      puts "\n[project info]: #{hash["attributes"]["name"]}"
+      puts "\n[projects info]: #{hash["attributes"]["name"]}"
       puts hash
     end
   end
 
-  def self.print_one(data)
+  def self.print(data)
+    puts "\n[project info]: #{data["attributes"]["name"]}"
     puts data
   end
 
