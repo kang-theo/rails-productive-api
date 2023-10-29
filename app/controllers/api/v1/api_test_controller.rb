@@ -18,7 +18,10 @@ class Api::V1::ApiTestController < ApplicationController
 
     # @project = Project.all
     # @project = Project.new.one(385299)
-    @project = Project.new(385299).one
+    # @project = Project.new(385299).one
+    # @project = Project.all
+    @project = Project.find(385299)
+    
   end
 
 end
