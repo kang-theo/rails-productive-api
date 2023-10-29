@@ -5,20 +5,19 @@ class Productive
 
   # https://api.productive.io/api/v2/projects
   def self.all
-    response = get_response(__method__)
+    response = http_get(__method__)
     print_all(response)
   end
 
   # Project.find(id)
   def self.find(id)
-    response = get_response_with_id(__method__, id)
+    response = http_get(__method__, id)
     print(response)
   end
 
+  # should be instance method, new and save
   def self.create
-    uri= "#{HOST}/#{self.name.downcase().pluralize()}"
-    response =  HttpClient.post(uri, set_payload(), set_option_headers())
-    # JSON.parse(response)["data"]
+    response = http_post(__method__, set_payload(), set_option_headers())
     pp response
   end
 
@@ -34,43 +33,60 @@ class Productive
   end
 
   private
- 
-  def self.get_response(method)
-    if method.to_s == "copy"
-      path = method.to_s
-    else
-      path = ""
-    end
+  # path = case method.to_s
+  # # id is bind to the instances
+  # when "archive"
+  #   "/#{id}/archive"
+  # when "restore"
+  #   "/#{id}/restore"
+  # else
+  #   "/#{id}"
+  # end
 
-    uri= "#{HOST}/#{self.name.downcase().pluralize()}" + path
+  def self.http_get(method, id="")
+    # uri= "#{HOST}/#{self.name.downcase().pluralize()}/#{id}"
+    uri = uri_generator(method, id)
+    http_exception_handler(uri) {|uri| HttpClient.get(uri)}
+  end
+
+  def self.http_post(method, payload, option_headers, path="")
+    uri = uri_generator(method) 
+    http_exception_handler(uri, payload, option_headers) {|uri, payload, option_headers| HttpClient.post(uri, payload, option_headers)}
+  end
+
+  def self.http_patch(id="", method)
+    uri= "#{HOST}/#{self.name.downcase().pluralize()}/#{id}"
+    http_exception_handler(uri) {|uri| HttpClient.patch(uri)}
+  end
+
+  def self.http_delete(id="")
+    uri= "#{HOST}/#{self.name.downcase().pluralize()}/#{id}"
+    http_exception_handler(uri) {|uri| HttpClient.delete(uri)}
+  end
+  
+  def self.http_exception_handler(uri, payload={}, option_headers={})
     begin
-      response = HttpClient.get(uri)
+      response = yield(uri, payload, option_headers)
       JSON.parse(response)["data"]
-      # raise HttpClient::HttpError.new("E001", "HTTP Error")
     rescue HttpClient::HttpError => e
       puts "Exception caught: #{e.message}"
     end
   end
 
-  def self.get_response_with_id(method, id)
-    path = case method.to_s
-    # id is bind to the instances
-    when "archive"
-      "/#{id}/archive"
-    when "restore"
-      "/#{id}/restore"
-    else
+  def self.uri_generator(method, id="")
+    str_method = method.to_s
+    path = case str_method
+    when "archive", "restore"
+      "/#{id}/" + str_method
+    when "copy", "change_workflow", "map_to_workflow"
+      str_method
+    when "find", "delete"
       "/#{id}"
+    else
+      ""
     end
 
     uri= "#{HOST}/#{self.name.downcase().pluralize()}" + path
-
-    begin
-      response = HttpClient.get(uri)
-      JSON.parse(response)["data"]
-    rescue HttpClient::HttpError => e
-      puts "Exception caught: #{e.message}"
-    end
   end
 
   def self.print_all(data)

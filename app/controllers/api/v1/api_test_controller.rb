@@ -6,9 +6,14 @@ class Api::V1::ApiTestController < ApplicationController
     # @project = Project.all
     # @project = Project.new.one(385299)
     # @project = Project.new(385299).one
+
     # @project = Project.all
     # @project = Project.find(385299)
+    # @project = Project.new(385299).create
     @project = Project.create
+    # @project = Project.update
+    # @project = Project.delete
+    # @project = Project.change_workflow
     
   end
 
