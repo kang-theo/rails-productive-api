@@ -13,8 +13,9 @@ module HttpClient
     Request.new.get(url, opt)
   end
 
-  # def self.post(url, payload={}, opt={})
-  # end
+  def self.post(url, payload=nil, opt={})
+    Request.new.post(url, payload, opt)
+  end
 
   # def self.patch(url, payload={}, opt={})
   # end
@@ -68,13 +69,17 @@ module HttpClient
       @use_cache
     end
 
-    def get( url, opt={} )
-      # get_response(url, 'GET', nil, opt)
-      logger.debug "HttpClient - get url: #{url}, opt: #{opt}"
-      response = get_response( url, nil, opt )
-
+    def send_request(url, method, payload=nil, opt={})
+      logger.debug "HttpClient - #{method} url: #{url}, opt: #{opt}"
+      response =  case method
+                    when 'GET'    then get_response( url, method, nil, opt )
+                    when 'POST'   then get_response( url, method, payload, opt )
+                    when 'PUT'    then get_response( url, method, payload, opt )
+                    when 'PATCH'  then get_response( url, method, payload, opt )
+                    when 'DELETE' then get_response( url, method, nil, opt )
+                  end
       # Error
-      if response.code != '200'
+      if response.code != '200' && response.code != '201'
         raise HttpError.new( response.code, response.message )
       end
 
@@ -83,22 +88,27 @@ module HttpClient
       {'status_code' => e.code, 'message' => e.message}
     end
 
-    def post(src, payload={}, opt={})
-    #   # 返回 HTTPResponse (code,message,body,etc.)
-    #   logger.debug "HttpClient - get url: #{url}, opt: #{opt}"
-    #   response = post_response( url, nil, opt )
-
-    #   # Error
-    #   if response.code != '200'
-    #     raise HttpError.new( response.code, response.message )
-    #   end
-
-    #   response.body
-    # rescue HttpError => e
-    #   {'code' => e.code, 'message' => e.message}
+    def get( url, opt={} )
+      send_request(url, 'GET', nil, opt)
     end
 
-    def get_response( url, payload={}, opt={} )
+    def post(url, payload=nil, opt={})
+      send_request(url, 'POST', payload, opt)
+    end
+
+    def patch(url, payload=nil, opt={})
+      send_request(url, 'PATCH', payload, opt)
+    end
+
+    def put(url, payload=nil, opt={})
+      send_request(url, 'PUT', payload, opt)
+    end
+
+    def delete(url, payload=nil, opt={})
+      send_request(url, 'DELETE', nil, opt)
+    end
+
+    def get_response( url, method='GET', payload=nil, opt={} )
       uri = URI.parse( url )
 
       proxy = ENV['HTTP_PROXY']
@@ -154,14 +164,22 @@ module HttpClient
           end
         end
 
-        request = Net::HTTP::Get.new( uri.request_uri, headers )
+        # https://ruby-doc.org/stdlib-3.0.0/libdoc/net/http/rdoc/Net/HTTP.html
+        request = case method
+                    when 'GET'    then Net::HTTP::Get.new( uri.request_uri, headers )
+                    when 'POST'   then Net::HTTP::Post.new( uri.request_uri, headers )
+                    when 'PUT'    then Net::HTTP::Put.new( uri.request_uri, headers )
+                    when 'PATCH'  then Net::HTTP::Patch.new( uri.request_uri, headers )
+                    when 'DELETE' then Net::HTTP::Delete.new( uri.request_uri, headers )
+                  end
+        
         # HTTP or HTTPs
         if uri.instance_of? URI::HTTPS
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
 
-        response = http.request( request )
+        response = http.request( request, payload )
 
         if response.code == '200' || response.code == '201'
           logger.debug "#{response.code} #{response.message}"
