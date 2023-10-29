@@ -43,7 +43,7 @@ module HttpClient
   end
 
   class Request
-    include Base::ReqParamBuilder::HeadersBuilder
+    include Base::ReqParamBuilder
 
     # logger.info, logger.debug ...
     include LogUtils::Logging
@@ -143,6 +143,7 @@ module HttpClient
 
         # headers setting
         headers = set_auth_headers()
+        puts headers
 
         unless opt['headers'].nil?
           headers.merge!(opt['headers'].to_h)
@@ -179,6 +180,9 @@ module HttpClient
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
 
+        puts request
+        puts payload
+        request.body = 
         response = http.request( request, payload )
 
         if response.code == '200' || response.code == '201'
