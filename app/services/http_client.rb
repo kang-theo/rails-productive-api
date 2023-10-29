@@ -17,8 +17,9 @@ module HttpClient
     Request.new.post(url, payload, opt)
   end
 
-  # def self.patch(url, payload={}, opt={})
-  # end
+  def self.patch(url, payload={}, opt={})
+    Request.new.patch(url, payload, opt)
+  end
 
   # def self.put(url, payload={}, opt={})
   # end

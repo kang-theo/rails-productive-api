@@ -10,8 +10,8 @@ class Api::V1::ApiTestController < ApplicationController
     # @project = Project.all
     # @project = Project.find(385299)
     # @project = Project.new(385299).create
-    @project = Project.create
-    # @project = Project.update
+    # @project = Project.create
+    @project = Project.new(385793, "update_proj2").update
     # @project = Project.delete
     # @project = Project.change_workflow
     

@@ -6,8 +6,8 @@ module Base
     # def set_options()
     #   ActiveSupport::JSON.encode({ :headers => set_option_headers, :body => create_body("post_proj2", "602830", "521440", "31589")})
     # end
-    def set_payload()
-      ActiveSupport::JSON.encode(create_body("post_proj5", "602830", "521440", "31589"))
+    def set_payload(name)
+      ActiveSupport::JSON.encode(create_body(name, "602830", "521440", "31589"))
     end
 
     def set_auth_headers(is_bulk=false)
@@ -28,33 +28,41 @@ module Base
     #   auth_headers.merge(optional_headers)
     end
   
-    def create_body(name, company_id, project_manager_id, workflow_id) 
+    def create_body(name, company_id = "", project_manager_id = "", workflow_id = "") 
+    # payload = {
+    #   "data": {
+    #       "type": "projects",
+    #       "attributes": {
+    #       "name": "#{name}",
+    #       "project_type_id": 2
+    #       },
+    #       "relationships": {
+    #       "company": {
+    #           "data": {
+    #           "type": "companies",
+    #           "id": "#{company_id}"
+    #           }
+    #       },
+    #       "project_manager": {
+    #           "data": {
+    #           "type": "people",
+    #           "id": "#{project_manager_id}"
+    #           }
+    #       },
+    #       "workflow": {
+    #           "data": {
+    #           "type": "workflows",
+    #           "id": "#{workflow_id}"
+    #           }
+    #         }
+    #       }
+    #     }
+    #   }
     payload = {
       "data": {
           "type": "projects",
           "attributes": {
-          "name": "#{name}",
-          "project_type_id": 2
-          },
-          "relationships": {
-          "company": {
-              "data": {
-              "type": "companies",
-              "id": "#{company_id}"
-              }
-          },
-          "project_manager": {
-              "data": {
-              "type": "people",
-              "id": "#{project_manager_id}"
-              }
-          },
-          "workflow": {
-              "data": {
-              "type": "workflows",
-              "id": "#{workflow_id}"
-              }
-            }
+          "name": "#{name}"
           }
         }
       }
