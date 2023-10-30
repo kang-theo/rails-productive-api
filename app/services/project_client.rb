@@ -1,11 +1,7 @@
-# require 'net/http'
-# require 'uri'
-class Project < Productive
+class ProjectClient < ProductiveClient
   include Base::ReqParamBuilder
 
-  attr_accessor :id
-  attr_accessor :new_name
-  attr_accessor :data
+  attr_accessor :id, :new_name, :data
 
   def initialize(id, new_name)
     @id = id

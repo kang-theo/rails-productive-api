@@ -1,17 +1,17 @@
-require 'json'
-class Productive
+class ProductiveClient
   include Base
   extend Base::ReqParamBuilder
 
   def self.all
     response = http_get(__method__)
-    print_all(response)
+    # print_all(response)
   end
 
   def self.find(id)
     #TODO: it is better to return a object
     response = http_get(__method__, id)
-    print(response)
+    project_data = JSON.parse(ActiveSupport::JSON.encode(response))
+    project = ProjectEntity.new(project_data) 
   end
 
   # TODO: create and update should be instance method, new and save
@@ -44,7 +44,6 @@ class Productive
   def self.http_exception_handler(uri, payload={}, option_headers={})
     begin
       response = yield(uri, payload, option_headers)
-      pp response
       JSON.parse(response)["data"]
     rescue HttpClient::HttpError => e
       puts "Exception caught: #{e.message}"
@@ -65,7 +64,7 @@ class Productive
       ""
     end
 
-    uri= "#{HOST}/#{self.name.downcase().pluralize()}" + path
+    uri= "#{HOST}/#{self.name.split(/(?=[A-Z])/).first.downcase().pluralize()}" + path
   end
 
   def self.print_all(data)

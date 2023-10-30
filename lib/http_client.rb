@@ -144,7 +144,6 @@ module HttpClient
 
         # headers setting
         headers = set_auth_headers()
-        puts headers
 
         unless opt['headers'].nil?
           headers.merge!(opt['headers'].to_h)

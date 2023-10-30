@@ -58,11 +58,12 @@ module Base
     #       }
     #     }
     #   }
-    payload = {
-      "data": {
+    payload = 
+      {
+        "data": {
           "type": "projects",
           "attributes": {
-          "name": "#{name}"
+            "name": "#{name}"
           }
         }
       }
