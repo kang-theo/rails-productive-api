@@ -19,9 +19,9 @@ class ProductiveClient
     project = ProjectEntity.new(project_data) 
   end
 
-  def self.where(name)
+  def self.where(condition)
     projects = all()
-    projects[name]
+    projects[condition[:name]]
   end
 
   # TODO: create and update should be instance method, new and save

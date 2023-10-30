@@ -18,8 +18,9 @@ class Api::V1::ApiTestController < ApplicationController
       print(value)
     end
 
-    # @project = ProjectClient.where("test-1")
-    # print(@project)
+    @project = ProjectClient.where("name":"test-1")
+    puts "===================================="
+    print(@project)
   end
 
   private
