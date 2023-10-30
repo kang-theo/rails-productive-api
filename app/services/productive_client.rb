@@ -19,9 +19,15 @@ class ProductiveClient
     project = ProjectEntity.new(project_data) 
   end
 
+  # query according to project name
   def self.where(condition)
     projects = all()
-    projects[condition[:name]]
+    condition.each do |key, value| 
+      puts key
+      puts value
+      # return projects[condition[:name]]
+      return projects[value]
+    end
   end
 
   # TODO: create and update should be instance method, new and save
@@ -88,6 +94,5 @@ class ProductiveClient
     puts "\n[project info]: #{data["attributes"]["name"]}"
     puts data
   end
-
   
 end

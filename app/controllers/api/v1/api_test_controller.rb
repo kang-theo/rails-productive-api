@@ -9,38 +9,33 @@ class Api::V1::ApiTestController < ApplicationController
     # @project = Project.change_workflow
     # @project = ProjectClient.find(385299)
 
-    @projects = ProjectClient.all
-    # # @projects.each do |project|
-    #   # print(@projects)
-    # # end
-    # print(@projects.first)
-    @projects.each do |key, value|
-      print(value)
+    # @projects = ProjectClient.all
+    # @projects.each do |key, value|
+    #   print(value)
+    # end
+
+    # @project = ProjectClient.find(385299)
+    # print(@project)
+
+    # find by name
+    @project = ProjectClient.where("name": "test-1")
+      print(@project)
     end
 
-    @project = ProjectClient.where("name":"test-1")
-    puts "===================================="
-    print(@project)
-  end
+    # find by project id
+    # @project = ProjectClient.where("id": 385299)
+    #   print(@project)
+    # end
 
   private
   def print(project)
-    printf("------------------------------------\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n", 
-          "name:", project.name,
-          "organization_type:", project.organization_type,
+    printf("------------------------------------\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n%-22s %s\n", 
+          "project_name:", project.name,
+          "project_id:", project.id,
           "organization_id:", project.organization_id,
-          "company_type:", project.company_type,
           "company_id:", project.company_id,
-          "project_manager_type:", project.project_manager_type,
           "project_manager_id:", project.project_manager_id,
-          "project_workflow_type:", project.workflow_type,
           "project_workflow_id:", project.workflow_id)
-
-    # project.instance_variables.each do |var|
-    #   var_name = var.to_s.delete("@")
-    #   value = project.instance_variable_get(var)
-    #   printf("%-12s %s\n", var_name + ":", value)
-    # end
   end
 
 end
