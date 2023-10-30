@@ -4,14 +4,24 @@ class ProductiveClient
 
   def self.all
     response = http_get(__method__)
-    # print_all(response)
+    project_data = JSON.parse(ActiveSupport::JSON.encode(response))
+    projects_hash = Hash.new
+    project_data.each do |datum|
+      project = ProjectEntity.new(datum)
+      projects_hash[project.name] = project
+    end
+    return projects_hash
   end
 
   def self.find(id)
-    #TODO: it is better to return a object
     response = http_get(__method__, id)
     project_data = JSON.parse(ActiveSupport::JSON.encode(response))
     project = ProjectEntity.new(project_data) 
+  end
+
+  def self.where(name)
+    projects = all()
+    projects[name]
   end
 
   # TODO: create and update should be instance method, new and save
