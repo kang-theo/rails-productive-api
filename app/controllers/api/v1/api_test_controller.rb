@@ -14,18 +14,20 @@ class Api::V1::ApiTestController < ApplicationController
     #   print(value)
     # end
 
-    # @project = ProjectClient.find(385299)
-    # print(@project)
+    @project = ProjectClient.find(385299)
+    print(@project)
 
     # find by name
-    @project = ProjectClient.where("name": "test-1")
-      print(@project)
-    end
+    # @project = ProjectClient.where("name": "test-1")
+    # print(@project)
 
     # find by project id
     # @project = ProjectClient.where("id": 385299)
-    #   print(@project)
-    # end
+    # print(@project)
+
+  end
+
+
 
   private
   def print(project)
@@ -36,6 +38,6 @@ class Api::V1::ApiTestController < ApplicationController
           "company_id:", project.company_id,
           "project_manager_id:", project.project_manager_id,
           "project_workflow_id:", project.workflow_id)
-  end
+    end
 
 end

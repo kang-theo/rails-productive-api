@@ -15,8 +15,26 @@ class ProductiveClient
 
   def self.find(id)
     response = http_get(__method__, id)
+    puts response
     project_data = JSON.parse(ActiveSupport::JSON.encode(response))
-    project = ProjectEntity.new(project_data) 
+
+    puts project_data
+    # test create accessors dynamically
+    json_data = project_data
+    project_entity = ProjectEntity.new(json_data)
+    puts "1------"
+    puts project_entity.type
+    puts project_entity.id
+    puts project_entity.attributes.class
+    puts project_entity.attributes.data["name"]
+    puts project_entity.attributes.data.name
+    puts project_entity.attributes.organization.class
+    puts project_entity.attributes.organization.data.type
+    puts project_entity.attributes.id
+    puts project_entity.organization.type
+    puts project_entity.memberships.first.type
+    
+    # project = ProjectEntity.new(project_data) 
   end
 
   # query according to project name
@@ -60,6 +78,10 @@ class ProductiveClient
   def self.http_exception_handler(uri, payload={}, option_headers={})
     begin
       response = yield(uri, payload, option_headers)
+      # JSON.parse(response)["data"]
+      # create accessors dynamically according to the json data
+      puts "2-----"
+      puts JSON.parse(response)["data"]
       JSON.parse(response)["data"]
     rescue HttpClient::HttpError => e
       puts "Exception caught: #{e.message}"
