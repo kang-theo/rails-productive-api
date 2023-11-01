@@ -7,6 +7,7 @@ class Project
 
   def create_accessors
     @data.each do |key, value|
+      # puts key, value
       define_singleton_method(key) do
         if value.is_a?(Hash)
           self.class.new(value)
@@ -16,14 +17,28 @@ class Project
           value
         end
       end
+
+      # define_singleton_method("#{key}=") do |new_value|
+      #   @data[key] = new_value if !value.is_a?(Hash) && !value.is_a?(Array)
+      # end
+      if !value.is_a?(Hash) && !value.is_a?(Array)
+        define_singleton_method("#{key}=") do |new_value|
+          instance_variable_set("@#{key}", new_value)
+          @data[key] = new_value
+        end
+      end
     end
   end
+
+  # def set_value(key, new_value)
+  #   instance_variable_set("@#{key}", new_value)
+  # end
 
   def to_s
     instance_variables.map do |var|
       value = instance_variable_get(var)
       "#{var}: #{value}"
-    end.join("\n")
+    end
   end
 end
 
