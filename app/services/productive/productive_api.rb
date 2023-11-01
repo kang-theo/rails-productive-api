@@ -1,19 +1,20 @@
 # app/services/productive_api.rb
-module ProductiveService
+module Productive
   class ProductiveApi
     include HTTParty
     base_uri 'https://api.productive.io/api/v2'
 
-    def initialize(api_key, org_id)
+    def initialize()
+      # api_key = "c664831b-4419-4bb0-9dc0-09816f04cea2"
+      # org_id = "30958"
       @headers = {
-        "X-Auth-Token" => api_key,
-        "X-Organization-Id" => org_id,
+        "X-Auth-Token" => Rails.application.credentials.productive_api_token,
+        "X-Organization-Id" => Rails.application.credentials.organization_id.to_s,
         "Content-Type" => "application/vnd.api+json"
       }
     end
 
     def all()
-      # response = self.class.get('/projects', headers: @headers)
       process_request()
     end
 
@@ -42,8 +43,8 @@ module ProductiveService
       handle_response(response)
     end
 
-    def pluralized_resource_name
-      self.class.name.split(/(?=[:A-Z])/).fifth.downcase.pluralize
+    def pluralized_resource_name()
+      self.class.name.split(/(?=[:A-Z])/).fifth.downcase().pluralize()
     end
 
   end

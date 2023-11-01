@@ -69,3 +69,5 @@ yarn-debug.log*
 /public/uploads
 
 .history
+
+/config/credentials/development.key

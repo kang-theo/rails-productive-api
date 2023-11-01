@@ -1,4 +1,3 @@
-# app/models/project.rb
 class Project
   def initialize(data)
     @data = data
@@ -7,7 +6,6 @@ class Project
 
   def create_accessors
     @data.each do |key, value|
-      # puts key, value
       define_singleton_method(key) do
         if value.is_a?(Hash)
           self.class.new(value)
