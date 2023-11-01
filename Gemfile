@@ -44,6 +44,7 @@ gem "bootsnap", require: false
 
 gem 'httparty'
 gem 'logutils', '~> 0.6.1'
+gem 'falcon'
 
 # Use Sass to process CSS
 # gem "sassc-rails"

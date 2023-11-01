@@ -19,21 +19,20 @@ class Project
     end
   end
 
+  def to_s
+    instance_variables.map do |var|
+      value = instance_variable_get(var)
+      "#{var}: #{value}"
+    end.join("\n")
+  end
+end
+
   # def to_s
-  #   puts id
-  #   puts "Calling to_s method!"
+  #   # debugger
   #   "Project ID: #{id}\n" \
   #   "Project Type: #{type}\n" \
   #   # "Project Attributes: #{attributes}\n" \
   #   # "Project Relationships: #{relationships}\n" \
   #   # Add additional attributes as needed
-  #   "-------------------------\n"
+  #   # "-------------------------\n"
   # end
-
-  # def to_s
-  #   instance_variables.map do |var|
-  #     value = instance_variable_get(var)
-  #     "#{var}: #{value}"
-  #   end.join("\n\n\n")
-  # end
-end

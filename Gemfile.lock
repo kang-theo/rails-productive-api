@@ -68,9 +68,32 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
+    async (2.6.5)
+      console (~> 1.10)
+      fiber-annotation
+      io-event (~> 1.1)
+      timers (~> 4.1)
+    async-container (0.16.12)
+      async
+      async-io
+    async-http (0.61.0)
+      async (>= 1.25)
+      async-io (>= 1.28)
+      async-pool (>= 0.2)
+      protocol-http (~> 0.25.0)
+      protocol-http1 (~> 0.16.0)
+      protocol-http2 (~> 0.15.0)
+      traces (>= 0.10.0)
+    async-http-cache (0.4.3)
+      async-http (~> 0.56)
+    async-io (1.36.1)
+      async
+    async-pool (0.4.0)
+      async (>= 1.25)
     bindex (0.8.1)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
+    build-environment (1.13.0)
     builder (3.2.4)
     capybara (3.39.2)
       addressable
@@ -82,12 +105,30 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     concurrent-ruby (1.2.2)
+    console (1.23.2)
+      fiber-annotation
+      fiber-local
     crass (1.0.6)
     date (3.3.3)
     debug (1.8.0)
       irb (>= 1.5.0)
       reline (>= 0.3.1)
     erubi (1.12.0)
+    falcon (0.42.3)
+      async
+      async-container (~> 0.16.0)
+      async-http (~> 0.57)
+      async-http-cache (~> 0.4.0)
+      async-io (~> 1.22)
+      build-environment (~> 1.13)
+      bundler
+      localhost (~> 1.1)
+      openssl (~> 3.0)
+      process-metrics (~> 0.2.0)
+      protocol-rack (~> 0.1)
+      samovar (~> 2.1)
+    fiber-annotation (0.2.0)
+    fiber-local (1.0.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     httparty (0.21.0)
@@ -99,12 +140,14 @@ GEM
       actionpack (>= 6.0.0)
       railties (>= 6.0.0)
     io-console (0.6.0)
+    io-event (1.3.3)
     irb (1.8.3)
       rdoc
       reline (>= 0.3.8)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    localhost (1.1.10)
     logutils (0.6.1)
     loofah (2.21.4)
       crass (~> 1.0.2)
@@ -114,6 +157,7 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mapping (1.1.1)
     marcel (1.0.2)
     matrix (0.4.2)
     method_source (1.0.0)
@@ -133,6 +177,20 @@ GEM
     nio4r (2.5.9)
     nokogiri (1.15.4-x86_64-darwin)
       racc (~> 1.4)
+    openssl (3.2.0)
+    process-metrics (0.2.1)
+      console (~> 1.8)
+      samovar (~> 2.1)
+    protocol-hpack (1.4.2)
+    protocol-http (0.25.0)
+    protocol-http1 (0.16.0)
+      protocol-http (~> 0.22)
+    protocol-http2 (0.15.1)
+      protocol-hpack (~> 1.4)
+      protocol-http (~> 0.18)
+    protocol-rack (0.2.6)
+      protocol-http (~> 0.23)
+      rack (>= 1.0)
     psych (5.1.1.1)
       stringio
     public_suffix (5.0.3)
@@ -178,6 +236,9 @@ GEM
       io-console (~> 0.5)
     rexml (3.2.6)
     rubyzip (2.3.2)
+    samovar (2.2.0)
+      console (~> 1.0)
+      mapping (~> 1.0)
     selenium-webdriver (4.14.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -195,6 +256,8 @@ GEM
     stringio (3.0.8)
     thor (1.3.0)
     timeout (0.4.0)
+    timers (4.3.5)
+    traces (0.11.1)
     turbo-rails (1.5.0)
       actionpack (>= 6.0.0)
       activejob (>= 6.0.0)
@@ -222,6 +285,7 @@ DEPENDENCIES
   bootsnap
   capybara
   debug
+  falcon
   httparty
   importmap-rails
   jbuilder
