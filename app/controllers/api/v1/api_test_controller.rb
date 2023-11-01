@@ -31,9 +31,8 @@ class Api::V1::ApiTestController < ApplicationController
     # print(project)
     # project.set_value("id", "12345")
     project.id = "12345"
-    puts project
     puts project.id
-    debugger
+    # debugger
     # print(project)
   end
 

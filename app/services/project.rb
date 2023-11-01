@@ -22,8 +22,9 @@ class Project
       #   @data[key] = new_value if !value.is_a?(Hash) && !value.is_a?(Array)
       # end
       if !value.is_a?(Hash) && !value.is_a?(Array)
+        # debugger
         define_singleton_method("#{key}=") do |new_value|
-          instance_variable_set("@#{key}", new_value)
+          self.class.instance_variable_set("@#{key}", new_value)
           @data[key] = new_value
         end
       end
