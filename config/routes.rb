@@ -1,10 +1,8 @@
 Rails.application.routes.draw do
   namespace :api do
-    namespace :v1 do
-      get 'projects/get_projects'
-      get 'projects/get_project_by_id'
-
-      get 'api_test/test_get_project_by_id'
+    namespace :v2 do
+      get 'projects/all'
+      get 'projects/find'
     end
   end
 end

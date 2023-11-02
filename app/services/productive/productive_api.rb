@@ -1,4 +1,4 @@
-# app/services/productive_api.rb
+require 'active_support/core_ext/hash'
 module Productive
   class ProductiveApi
     include HTTParty
@@ -25,13 +25,13 @@ module Productive
     private
 
     def handle_response(response)
-      if response.success?
+      if response.success? && !response.body.blank?
         parsed_data = JSON.parse(response.body)["data"]
         # debugger
         if parsed_data.is_a?(Array)
           parsed_data.map { |project_data| Project.new(project_data) }
         else
-          Project.new(parsed_data)
+          [Project.new(parsed_data)]
         end
       else
         raise "API request failed with status #{response.code}: #{response.body}"
@@ -39,12 +39,13 @@ module Productive
     end
 
     def process_request(endpoint = "")
+      # debugger
       response = self.class.get("/#{pluralized_resource_name()}/#{endpoint}", headers: @headers)
       handle_response(response)
     end
 
     def pluralized_resource_name()
-      self.class.name.split(/(?=[:A-Z])/).fifth.downcase().pluralize()
+      self.class.name.split(/(?=[:A-Z])/).fourth.downcase().pluralize()
     end
 
   end
