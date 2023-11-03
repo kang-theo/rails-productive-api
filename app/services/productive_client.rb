@@ -30,7 +30,6 @@ class ProductiveClient
       elsif
         project_result.push(Project.new(parsed_data))
       end
-      debugger
       return project_result
     else
       raise "API request failed with status #{response.code}: #{response.body}"

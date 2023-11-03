@@ -33,7 +33,7 @@ class Project
 
         define_method("#{key}=") do |new_value|
           # instance_variable_set("@#{key}", new_value)
-          hash[key] = new_value
+          @data[key] = new_value
         end
       end
     end
