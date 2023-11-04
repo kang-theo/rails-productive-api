@@ -1,4 +1,7 @@
+require 'logutils'
+
 class ProductiveClient
+  include LogUtils::Logging
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
@@ -37,6 +40,7 @@ class ProductiveClient
   end
 
   def process_request(endpoint = "")
+    logger.info("Http Request: #{self.class.default_options[:base_uri]}/#{pluralized_resource_name()}/#{endpoint}")
     response = self.class.get("/#{pluralized_resource_name()}/#{endpoint}", headers: @headers)
     handle_response(response)
   end

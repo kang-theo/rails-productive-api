@@ -41,7 +41,6 @@ class Project
 
   def to_s
     instance_variables.map do |var|
-      puts var
       value = instance_variable_get(var)
       "#{var}: #{value}"
     end
