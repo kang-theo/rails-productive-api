@@ -7,9 +7,9 @@ class ProductiveClient
 
   def initialize()
     @headers = {
-      "X-Auth-Token" => Rails.application.credentials.productive_api_token,
-      "X-Organization-Id" => Rails.application.credentials.organization_id.to_s,
-      "Content-Type" => "application/vnd.api+json"
+      "X-Auth-Token": Rails.application.credentials.productive_api_token,
+      "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
+      "Content-Type": "application/vnd.api+json"
     }
   end
 
@@ -32,6 +32,7 @@ class ProductiveClient
         parsed_data.map {|item| project_result.push(Project.new(item))}
       elsif
         project_result.push(Project.new(parsed_data))
+        debugger
       end
       return project_result
     else
@@ -44,6 +45,10 @@ class ProductiveClient
     response = self.class.get("/#{pluralized_resource_name()}/#{endpoint}", headers: @headers)
     handle_response(response)
   end
+
+
+  # def process_request({"id": "id", "path": "path"})
+  # end
 
   def pluralized_resource_name()
     self.class.name.split(/(?=[:A-Z])/).first.downcase().pluralize()

@@ -6,35 +6,20 @@ class Project
 
 # testing data: {"id": 1, "type": "testc", "attributes": { "name": "test project", "number": "1", "project_number": "1", "project_type_id": "2", "project_color_id": "null", "last_activity_at": "2023-10-23T06:10:48.000+02:00", "public_access": true, "time_on_tasks": true, "tag_colors": {}, "archived_at": "null", "created_at": "2023-10-23T06:10:48.107+02:00", "template": false, "budget_closing_date": "null", "needs_invoicing": false, "custom_fields": "null", "task_custom_fields_ids": "null", "sample_data": false }}
   def initialize(data)
-    @data = construct_instance_var(data)
-    create_accessors
-  end
+    attributes = data["attributes"]
+    attributes.each do |key, value|
+      instance_variable_set("@#{key}", value)
+      instance_variable_get("@#{key}")
 
-  def construct_instance_var(data)
-    attr_hash = data["attributes"]
-    root_hash = Hash.new()
-
-    data.each do |key, value|
-      unless value.is_a?(Hash)
-        root_hash[key] = value
-      end
-    end
-
-    root_hash.merge(attr_hash)
-  end
-
-  def create_accessors
-    @data.each do |key, value|
       class_eval do
         define_method(key) do
-          # instance_variable_get("@#{key}")
-          value
+          instance_variable_get("@#{key}")
         end
 
-        define_method("#{key}=") do |new_value|
-          # instance_variable_set("@#{key}", new_value)
-          @data[key] = new_value
+        define_method("#{key}=") do |value|
+          instance_variable_set("@#{key}", value)
         end
+        # debugger
       end
     end
   end
