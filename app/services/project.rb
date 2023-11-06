@@ -4,13 +4,20 @@ class Project
   # belongs_to :organization
   # has_many :member_ships
 
-# testing data: {"id": 1, "type": "testc", "attributes": { "name": "test project", "number": "1", "project_number": "1", "project_type_id": "2", "project_color_id": "null", "last_activity_at": "2023-10-23T06:10:48.000+02:00", "public_access": true, "time_on_tasks": true, "tag_colors": {}, "archived_at": "null", "created_at": "2023-10-23T06:10:48.107+02:00", "template": false, "budget_closing_date": "null", "needs_invoicing": false, "custom_fields": "null", "task_custom_fields_ids": "null", "sample_data": false }}
   def initialize(data)
-    # think about id and type later
-    attributes = data["attributes"]
-    attributes.each do |key, value|
+    instance_attrs = data["attributes"].merge({id: data["id"]})
+
+    data["relationships"].each do |key, value|
+      foreign_key = "#{key}_id"
+
+      if value.is_a?(Hash)
+        # debugger
+        instance_attrs[foreign_key.to_sym] = find_foreign_key_id(value, "id")
+      end
+    end
+
+    instance_attrs.each do |key, value|
       instance_variable_set("@#{key}", value)
-      # instance_variable_get("@#{key}")
 
       class_eval do
         define_method(key) do
@@ -24,12 +31,27 @@ class Project
     end
   end
 
-  def to_s
-    instance_variables.map do |var|
-      value = instance_variable_get(var)
-      "#{var}: #{value}"
+  private
+
+  def find_foreign_key_id(hash, target_key)
+    hash.each do |key, value|
+      if value.is_a?(Hash)
+        result = find_foreign_key_id(value, target_key)
+        return result if result
+      elsif key == target_key
+        return value
+      end
     end
+
+    nil
   end
+
+  # def to_s
+  #   instance_variables.map do |var|
+  #     value = instance_variable_get(var)
+  #     "#{var}: #{value}"
+  #   end
+  # end
 
 #   def company
 #     # Company.find

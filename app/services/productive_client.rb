@@ -40,18 +40,15 @@ class ProductiveClient
   end
 
   def process_request(req_params)
-    debugger
     logger.info("Http Request: #{self.class.default_options[:base_uri]}/#{pluralized_resource_name()}/#{req_params[:id]}")
     response = self.class.get("/#{pluralized_resource_name()}/#{req_params[:id]}", headers: @headers)
     handle_response(response)
   end
 
 
-  # def process_request({"id": "id", "path": "path"})
-  # end
-
   def pluralized_resource_name()
-    self.class.name.split(/(?=[:A-Z])/).first.downcase().pluralize()
+    request_module = self.class.name.split("Client").first
+    request_module.downcase().pluralize()
   end
 
 end
