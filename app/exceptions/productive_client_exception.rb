@@ -1,0 +1,2 @@
+class ProductiveClientException < StandardError
+end

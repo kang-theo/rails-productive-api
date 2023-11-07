@@ -1,7 +1,4 @@
-require 'logutils'
-
 class ProductiveClient
-  include LogUtils::Logging
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
@@ -33,22 +30,27 @@ class ProductiveClient
 
     if parsed_data.is_a?(Array)
       parsed_data.map {|item| project_result.push(Project.new(item))}
-    elsif
+    else
       project_result.push(Project.new(parsed_data))
     end
     project_result
   end
 
-  def process_request(req_params)
-    logger.info("Http Request: #{self.class.default_options[:base_uri]}/#{pluralized_resource_name()}/#{req_params[:id]}")
-    response = self.class.get("/#{pluralized_resource_name()}/#{req_params[:id]}", headers: @headers)
+  def process_request(options)
+    Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}/#{pluralized_resource_name()}/#{options[:id]}")
+
+    response = self.class.get("/#{pluralized_resource_name()}/#{options[:id]}", headers: @headers)
     handle_response(response)
   end
 
-
   def pluralized_resource_name()
-    request_module = self.class.name.split("Client").first
-    request_module.downcase().pluralize()
+    request_module = self.class.name.split("Client")
+
+    if request_module.nil?
+      raise ProductiveClientException, "Request module not found"
+    end
+
+    request_module.first.downcase().pluralize()
   end
 
 end
