@@ -5,23 +5,18 @@ class Project < Base
   # has_many :member_ships
 
 
-#   def company
-#     # Company.find
-#   end
+  def company(id)
+    company = ProductiveClient.new("companies")
+    company.find(id)
+  end
 
-#   def self.find_all_by_company(company_id)
-    
-#     data.each do |item|
-#       if item.relationships.company.data.id ===company_id
-#     end
-#   end
 
-#   def workflow
+# def workflow
 # end
 
-#   def organization
+# def organization
 
-#   end
+# end
 
 #   def project_manager(id)
 #     People.find(id)
@@ -29,5 +24,13 @@ class Project < Base
 
 #   def member_ships
 
+#   end
+
+
+#   def self.find_all_by_company(company_id)
+    
+#     data.each do |item|
+#       if item.relationships.company.data.id ===company_id
+#     end
 #   end
 end

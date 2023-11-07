@@ -13,16 +13,17 @@ class ProductiveClient
     }
   end
 
-  # options: {entity: "", id: nil, action: "", data: {}}, hash.default
+  # options: {entity: "", id: nil, action: "", data: {}}
   def all
-    raise ProductiveClientException, "Entity is nil" if entity.nil? 
+    raise ApiRequestError, "Entity is nil" if entity.nil? 
     get(Hash[entity: entity])
   end
 
   def find(id)
-    raise ProductiveClientException, "Entity or Id is nil" if entity.nil? || id.nil?
-    process_request(Hash[entity: entity, id: id])
+    raise ApiRequestError, "Entity or Id is nil" if entity.nil? || id.nil?
+    get(Hash[entity: entity, id: id])
   end
+
 
   private
 
@@ -38,7 +39,7 @@ class ProductiveClient
 
   def handle_response(response)
     if !response.success? || response.body.blank?
-      raise "API request failed with status #{response.code}: #{response.body}"
+      raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}"
     end
 
     parsed_data = JSON.parse(response.body)["data"]
