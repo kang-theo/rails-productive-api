@@ -2,7 +2,10 @@ class ProductiveClient
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
-  def initialize
+  attr_accessor :entity
+
+  def initialize(entity = "")
+    @entity = entity
     @headers = {
       "X-Auth-Token": Rails.application.credentials.productive_api_token,
       "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
@@ -10,15 +13,28 @@ class ProductiveClient
     }
   end
 
+  # options: {entity: "", id: nil, action: "", data: {}}, hash.default
   def all
-    process_request({})
+    raise ProductiveClientException, "Entity is nil" if entity.nil? 
+    get(Hash[entity: entity])
   end
 
   def find(id)
-    process_request({id: id})
+    raise ProductiveClientException, "Entity or Id is nil" if entity.nil? || id.nil?
+    process_request(Hash[entity: entity, id: id])
   end
 
   private
+
+  def get(options)
+    uri = "/#{options[:entity]}"
+    uri += "/#{options[:id]}" if options[:id]
+
+    Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}#{uri}")
+
+    response = self.class.get(uri, headers: @headers)
+    handle_response(response)
+  end
 
   def handle_response(response)
     if !response.success? || response.body.blank?
@@ -36,21 +52,18 @@ class ProductiveClient
     project_result
   end
 
-  def process_request(options)
-    Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}/#{pluralized_resource_name()}/#{options[:id]}")
+  # def post(uri, data)
+  #   @options[:body] = data.to_json
+  #   self.class.post(uri, @options)
+  # end
 
-    response = self.class.get("/#{pluralized_resource_name()}/#{options[:id]}", headers: @headers)
-    handle_response(response)
-  end
+  # def put(uri, data)
+  #   @options[:body] = data.to_json
+  #   self.class.put(uri, @options)
+  # end
 
-  def pluralized_resource_name
-    request_module = self.class.name.split("Client")
-
-    if request_module.nil?
-      raise ProductiveClientException, "Request module not found"
-    end
-
-    request_module.first.downcase().pluralize()
-  end
+  # def delete(uri)
+  #   self.class.delete(uri, @options)
+  # end
 
 end

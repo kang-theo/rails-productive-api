@@ -4,12 +4,6 @@ class Project < Base
   # belongs_to :organization
   # has_many :member_ships
 
-  # def to_s
-  #   instance_variables.map do |var|
-  #     value = instance_variable_get(var)
-  #     "#{var}: #{value}"
-  #   end
-  # end
 
 #   def company
 #     # Company.find
