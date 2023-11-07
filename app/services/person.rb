@@ -1,3 +1,3 @@
-class Person
+class Person < Base
 
 end

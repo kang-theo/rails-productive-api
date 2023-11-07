@@ -2,7 +2,7 @@ class ProductiveClient
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
-  def initialize()
+  def initialize
     @headers = {
       "X-Auth-Token": Rails.application.credentials.productive_api_token,
       "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
@@ -10,7 +10,7 @@ class ProductiveClient
     }
   end
 
-  def all()
+  def all
     process_request({})
   end
 
@@ -43,7 +43,7 @@ class ProductiveClient
     handle_response(response)
   end
 
-  def pluralized_resource_name()
+  def pluralized_resource_name
     request_module = self.class.name.split("Client")
 
     if request_module.nil?

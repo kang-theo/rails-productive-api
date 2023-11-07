@@ -1,4 +1,4 @@
-class Organization
+class Organization < Base
   # DSL
   # has_many :companies
   # has_many :projects, :through => :companies
@@ -20,7 +20,7 @@ class Organization
   end
 
   def projects(id)
-    Componay.find_all(orgnazation_id).each |cmp|
+    Componay.find_all(orgnazation_id).each do |cmp|
       cmp.projects
     end
   end

@@ -1,3 +1,3 @@
-class Workflow
+class Workflow < Base
 
 end
