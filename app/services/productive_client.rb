@@ -43,14 +43,21 @@ class ProductiveClient
     end
 
     parsed_data = JSON.parse(response.body)["data"]
-    project_result = Array.new()
+    entity_result = Array.new()
+
+    if entity.nil?
+      raise ApiRequestError, "Entity is nil" 
+    else
+      # "projects" -> "Project"
+      entity_name = entity.singularize.capitalize 
+    end
 
     if parsed_data.is_a?(Array)
-      parsed_data.map {|item| project_result.push(Project.new(item))}
+      parsed_data.map {|item| entity_result.push(Object.const_get(entity_name).new(item))}
     else
-      project_result.push(Project.new(parsed_data))
+      entity_result.push(Object.const_get(entity_name).new(parsed_data))
     end
-    project_result
+    entity_result 
   end
 
   # def post(uri, data)
