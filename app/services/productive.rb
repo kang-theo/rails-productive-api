@@ -9,8 +9,16 @@ class Productive
       if value.is_a?(Hash)
         instance_attrs[foreign_key.to_sym] = find_foreign_key_id(value, "id")
       end
+
+      # define association methods for company, organization, workflow, etc according to each entity's foreign_keys
+      self.class.class_eval do
+        define_method(key.to_sym) do
+          Object.const_get(key.capitalize).find(self.send("#{key}_id"))
+        end
+      end
     end
 
+    # define setters and getters for instance attributes
     instance_attrs.each do |key, value|
       instance_variable_set("@#{key}", value)
 
