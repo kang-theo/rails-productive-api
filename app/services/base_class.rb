@@ -15,10 +15,7 @@ module BaseClass
   def find(id)
     client = get_client
     entity = client.get(Hash[entity: client.entity, id: id]) unless client.nil?
-    if entity.is_a?(Array)
-      entity.first
-    end
+    entity.first
   end
-
 
 end

@@ -41,6 +41,7 @@ class ProductiveClient
     if parsed_data.is_a?(Array)
       parsed_data.map {|item| entity_result.push(Object.const_get(entity_name).new(item))}
     else
+      # debugger
       entity_result.push(Object.const_get(entity_name).new(parsed_data))
     end
     entity_result 
