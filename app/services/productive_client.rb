@@ -1,4 +1,5 @@
 class ProductiveClient
+
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
@@ -15,7 +16,7 @@ class ProductiveClient
 
   def get(options)
     uri = "/#{options[:entity]}"
-    uri += "/#{options[:id]}" if options[:id]
+    uri += "/#{options[:id]}" if options.has_key?(:id)
 
     Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}#{uri}")
 
@@ -29,7 +30,7 @@ class ProductiveClient
     end
 
     parsed_data = JSON.parse(response.body)["data"]
-    entity_result = Array.new()
+    entity_result = []
 
     if entity.nil?
       raise ApiRequestError, "Entity is nil" 

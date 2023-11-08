@@ -34,6 +34,24 @@ class Productive
     end
   end
 
+  # options: {entity: "", id: nil, action: "", data: {}}
+  # usage: Project.all, Company.all
+  def self.all
+    client = get_client
+    return [] if client.nil?
+
+    client.get(Hash[entity: client.entity])
+  end
+
+  def self.find(id)
+    client = get_client
+    return nil if client.nil?
+
+    entity = client.get(Hash[entity: client.entity, id: id])
+    entity.first
+  end
+
+
   private
 
   def find_foreign_key_id(hash, target_key)
@@ -47,6 +65,12 @@ class Productive
     end
 
     nil
+  end
+
+  def self.get_client
+    raise ApiRequestError, "Entity is nil" if self.name.nil? 
+    entity = self.name.downcase.pluralize
+    client = ProductiveClient.new(entity)
   end
 
 end

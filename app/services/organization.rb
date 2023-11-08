@@ -1,8 +1,9 @@
 class Organization < Productive
-  extend BaseClass
+
+  def projects
+    # Project.Organization(id)
+    # Project.Company(id)
+  end
 
 end
 
-def projects
-  Project.find_all_by_company(id)
-end

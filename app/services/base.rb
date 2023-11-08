@@ -1,4 +1,4 @@
-module BaseInstance
+module Base
   # instance methods for entities
   # usage: proj = Project.new()   proj.update
   def update

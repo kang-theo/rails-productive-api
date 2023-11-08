@@ -1,5 +1,4 @@
 class Project < Productive
-  extend BaseClass
 
   def self.copy
 
