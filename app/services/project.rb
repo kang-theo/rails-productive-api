@@ -1,13 +1,8 @@
-class Project < Base
-  # belongs_to :people
-  # belongs_to :workflow
-  # belongs_to :organization
-  # has_many :member_ships
+class Project < Productive
+  extend BaseClass
 
-
-  def company(id)
-    company = ProductiveClient.new("companies")
-    company.find(id)
+  def company
+    Company.find(company_id)
   end
 
 

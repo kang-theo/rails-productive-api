@@ -1,4 +1,5 @@
-class Company < Base
+class Company < Productive
+  extend BaseClass
 
 end
 

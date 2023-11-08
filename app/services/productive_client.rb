@@ -13,20 +13,6 @@ class ProductiveClient
     }
   end
 
-  # options: {entity: "", id: nil, action: "", data: {}}
-  def all
-    raise ApiRequestError, "Entity is nil" if entity.nil? 
-    get(Hash[entity: entity])
-  end
-
-  def find(id)
-    raise ApiRequestError, "Entity or Id is nil" if entity.nil? || id.nil?
-    get(Hash[entity: entity, id: id])
-  end
-
-
-  private
-
   def get(options)
     uri = "/#{options[:entity]}"
     uri += "/#{options[:id]}" if options[:id]
@@ -55,6 +41,7 @@ class ProductiveClient
     if parsed_data.is_a?(Array)
       parsed_data.map {|item| entity_result.push(Object.const_get(entity_name).new(item))}
     else
+      debugger
       entity_result.push(Object.const_get(entity_name).new(parsed_data))
     end
     entity_result 

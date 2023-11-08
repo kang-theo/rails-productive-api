@@ -1,3 +1,0 @@
-class Workflow < Base
-
-end

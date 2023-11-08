@@ -1,4 +1,5 @@
-class Base
+class Productive
+
   def initialize(data)
     instance_attrs = data["attributes"].merge(id: data["id"])
 
@@ -25,6 +26,19 @@ class Base
     end
   end
 
+  # options: {entity: "", id: nil, action: "", data: {}}
+  # usage: Project.all, Company.all
+  def self.all
+    client = get_client
+    client.get(Hash[entity: client.entity]) unless client.nil?
+  end
+
+  def self.find(id)
+    client = get_client
+    client.get(Hash[entity: client.entity, id: id]) unless client.nil?
+  end
+
+
   private
 
   def find_foreign_key_id(hash, target_key)
@@ -39,4 +53,5 @@ class Base
 
     nil
   end
+
 end
