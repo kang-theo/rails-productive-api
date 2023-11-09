@@ -4,26 +4,28 @@ class Base
     instance_attrs = response["attributes"].merge(id: response["id"])
 
     response["relationships"].each do |key, value|
-      foreign_key = "#{key}_id"
-
       next unless value.is_a?(Hash)
 
       data = value["data"]
       next if data.blank?
 
+      foreign_key = "#{key}_id"
+      type = nil
+
       unless data.is_a?(Array)
         instance_attrs[foreign_key.to_sym] = data["id"]
+        type = data["type"]
       else
         # eg. :memberships_id=>["6104455", "6104456", "6104457", "6104464"], and custome_field_people=>[]
         instance_attrs[foreign_key.to_sym] = data.map do |datum|
           next if datum.blank?
+
+          type ||= datum["type"]
           datum["id"]
         end
       end
 
-      debugger
-      puts data["type"]
-      define_foreign_key_methods(data["type"], instance_attrs[foreign_key.to_sym])
+      define_foreign_key_methods(type, instance_attrs[foreign_key.to_sym])
     end
 
     # define setters and getters for instance attributes
