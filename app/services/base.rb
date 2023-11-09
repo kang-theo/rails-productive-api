@@ -5,26 +5,20 @@ class Base
 
     data["relationships"].each do |key, value|
       foreign_key = "#{key}_id"
-      puts key
 
       if value.is_a?(Hash)
         data = value["data"]
 
-        if data.is_a?(Array)
-          # :memberships_id=>["6104455", "6104456", "6104457", "6104464"]
+        unless data.is_a?(Array)
+          instance_attrs[foreign_key.to_sym] = data["id"] unless data.blank?
+        else
+          # eg. :memberships_id=>["6104455", "6104456", "6104457", "6104464"], and custome_field_people=>[]
           instance_attrs[foreign_key.to_sym] = data.map do |datum|
             datum["id"] unless datum.blank?
           end
-        else
-          instance_attrs[foreign_key.to_sym] = data["id"] unless data.blank?
         end
-      end
 
-      # define association methods for company, organization, workflow, etc according to each entity's foreign_keys
-      self.class.class_eval do
-        define_method(key.to_sym) do
-          Object.const_get(key.capitalize).find(self.send("#{key}_id"))
-        end
+        define_foreign_key_methods(key, instance_attrs[foreign_key.to_sym])
       end
     end
 
@@ -42,10 +36,10 @@ class Base
         end
       end
     end
-  end
+  end # initialize
 
   def self.client
-    @@client ||= ProductiveClient.new(self.name.downcase.pluralize)
+    @@client = ProductiveClient.new(self.name.downcase.pluralize)
   end
 
   # options: {entity: "", id: nil, action: "", data: {}}
@@ -61,17 +55,24 @@ class Base
 
   private
 
-  # def find_foreign_key_id(hash, target_key)
-  #   hash.each do |key, value|
-  #     if value.is_a?(Hash)
-  #       result = find_foreign_key_id(value, target_key)
-  #       return result if result
-  #     elsif key == target_key
-  #       return value
-  #     end
-  #   end
-
-  #   nil
-  # end
+  def define_foreign_key_methods(key, ids)
+    # define association methods for company, organization, etc. according to each entity's foreign_keys
+    unless ids.is_a?(Array)
+      self.class.class_eval do
+        define_method(key.to_sym) do
+          # Object.const_get(key.capitalize).find(self.send("#{key}_id"))
+          Object.const_get(key.capitalize).find(ids)
+        end
+      end
+    else # define association methods for multiple memberships, etc.
+      self.class.class_eval do
+        define_method(key.to_sym) do
+          ids.map do |id|
+            Object.const_get(key.singularize.capitalize).find(id)
+          end
+        end
+      end
+    end
+  end
 
 end
