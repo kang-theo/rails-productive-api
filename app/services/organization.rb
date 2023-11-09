@@ -1,4 +1,4 @@
-class Organization < Productive
+class Organization < Base
 
   def projects
     # Project.Organization(id)

@@ -14,7 +14,7 @@ class ProductiveClient
     }
   end
 
-  def get(options)
+  def get(options = {})
     uri = "/#{options[:entity]}"
     uri += "/#{options[:id]}" if options.has_key?(:id)
 

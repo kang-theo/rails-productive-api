@@ -1,4 +1,4 @@
-class Project < Productive
+class Project < Base
 
   def self.copy
 

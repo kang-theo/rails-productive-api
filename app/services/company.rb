@@ -1,4 +1,4 @@
-class Company < Productive
+class Company < Base
 
   def projects
     Project.find(id)
