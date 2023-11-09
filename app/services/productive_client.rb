@@ -15,7 +15,7 @@ class ProductiveClient
   end
 
   def get(options = {})
-    uri = "/#{options[:entity]}"
+    uri = "/#{entity}"
     uri += "/#{options[:id]}" if options.has_key?(:id)
 
     Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}#{uri}")

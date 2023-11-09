@@ -51,11 +51,13 @@ class Base
   # options: {entity: "", id: nil, action: "", data: {}}
   # usage: Project.all, Company.all
   def self.all
-    client.get(Hash[entity: client.entity])
+    client.get
   end
 
   def self.find(id)
-    entity = client.get(Hash[entity: client.entity, id: id])
+    entity = client.get({id: id})
+
+    return nil if entity.nil?
     entity.first
   end
 
