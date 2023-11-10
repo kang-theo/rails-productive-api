@@ -1,22 +1,23 @@
-class ProductiveClient
+# frozen_string_literal: true
 
+class ProductiveClient
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
   attr_accessor :entity
 
-  def initialize(entity = "")
+  def initialize(entity = '')
     @entity = entity
     @headers = {
       "X-Auth-Token": Rails.application.credentials.productive_api_token,
       "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
-      "Content-Type": "application/vnd.api+json"
+      "Content-Type": 'application/vnd.api+json'
     }
   end
 
   def get(options = {})
     uri = "/#{entity}"
-    uri += "/#{options[:id]}" if options.has_key?(:id)
+    uri += "/#{options[:id]}" if options.key?(:id)
 
     Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}#{uri}")
 
@@ -29,23 +30,21 @@ class ProductiveClient
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}"
     end
 
-    parsed_data = JSON.parse(response.body)["data"]
+    parsed_data = JSON.parse(response.body)['data']
     entity_result = []
 
-    if entity.nil?
-      raise ApiRequestError, "Entity is nil" 
-    else
-      # "projects" -> "Project"
-      entity_name = entity.singularize.capitalize 
-    end
+    raise ApiRequestError, 'Entity is nil' if entity.nil?
+
+    # "projects" -> "Project"
+    entity_name = entity.singularize.capitalize
 
     if parsed_data.is_a?(Array)
-      parsed_data.map {|item| entity_result.push(Object.const_get(entity_name).new(item))}
+      parsed_data.map { |item| entity_result.push(Object.const_get(entity_name).new(item)) }
     else
       # debugger
       entity_result.push(Object.const_get(entity_name).new(parsed_data))
     end
-    entity_result 
+    entity_result
   end
 
   # def post(uri, data)
@@ -61,5 +60,4 @@ class ProductiveClient
   # def delete(uri)
   #   self.class.delete(uri, @options)
   # end
-
 end
