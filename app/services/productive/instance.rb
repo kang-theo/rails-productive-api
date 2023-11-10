@@ -1,4 +1,4 @@
-module Instance
+module Productive::Instance
   # instance methods for entities
   # usage: proj = Project.new()   proj.update
   def update

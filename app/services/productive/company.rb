@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Company < Base
+class Productive::Company < Productive::Base
   def projects
     Project.find(id)
   end

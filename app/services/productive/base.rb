@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Base
+class Productive::Base
   @@relations = {
     Project: 'projects',
     Company: 'companies',
@@ -54,7 +54,10 @@ class Base
   end
 
   def self.client
-    @@client = ProductiveClient.new(@@relations["#{self.name}".to_sym])
+    raise ApiRequestError, 'Resource does not exist.' if self.name.nil?
+
+    relation_key = self.name.demodulize.to_sym
+    @@client = Productive::ProductiveClient.new(@@relations[relation_key])
   end
 
   # usage: Project.all, Company.all
@@ -74,21 +77,21 @@ class Base
   def define_foreign_key_methods(type, ids)
     method_name = type.singularize
     klass = method_name.capitalize
+    module_name = self.class.module_parent.name
 
     # define association methods for company, organization, etc. according to each entity's foreign_keys
     if ids.is_a?(Array) # define association methods for multiple memberships, etc.
       self.class.class_eval do
         define_method(method_name.to_sym) do
           ids.map do |id|
-            Object.const_get(klass.singularize.capitalize).find(id)
+            Object.const_get(module_name + '::' + klass).find(id)
           end
         end
       end
     else
       self.class.class_eval do
         define_method(method_name.to_sym) do
-          # Object.const_get(key.capitalize).find(self.send("#{key}_id"))
-          Object.const_get(klass).find(ids)
+          Object.const_get(module_name + '::' + klass).find(ids)
         end
       end
     end

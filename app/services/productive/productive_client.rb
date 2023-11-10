@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProductiveClient
+class Productive::ProductiveClient
   include HTTParty
   base_uri 'https://api.productive.io/api/v2'
 
@@ -30,19 +30,18 @@ class ProductiveClient
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}"
     end
 
-    parsed_data = JSON.parse(response.body)['data']
-    entity_result = []
-
     raise ApiRequestError, 'Entity is nil' if entity.nil?
 
+    parsed_data = JSON.parse(response.body)['data']
+    module_name = self.class.module_parent.name
     # "projects" -> "Project"
-    entity_name = entity.singularize.capitalize
+    klass = entity.singularize.capitalize
+    entity_result = []
 
     if parsed_data.is_a?(Array)
-      parsed_data.map { |item| entity_result.push(Object.const_get(entity_name).new(item)) }
+      parsed_data.map { |item| entity_result.push(Object.const_get("#{module_name}::#{klass}").new(item)) }
     else
-      # debugger
-      entity_result.push(Object.const_get(entity_name).new(parsed_data))
+      entity_result.push(Object.const_get("#{module_name}::#{klass}").new(parsed_data))
     end
     entity_result
   end
