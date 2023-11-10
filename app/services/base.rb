@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 class Base
+  @@relations = {
+    Project: 'projects',
+    Company: 'companies',
+    Organization: 'organizations',
+    Person: 'people',
+    Membership: 'memberships'
+  }
+  
   def initialize(response)
     instance_attrs = response['attributes'].merge(id: response['id'])
 
@@ -46,10 +54,9 @@ class Base
   end
 
   def self.client
-    @@client = ProductiveClient.new(self.name.downcase.pluralize)
+    @@client = ProductiveClient.new(@@relations["#{self.name}".to_sym])
   end
 
-  # options: {entity: "", id: nil, action: "", data: {}}
   # usage: Project.all, Company.all
   def self.all
     client.get
@@ -59,7 +66,6 @@ class Base
     entity = client.get({ id: })
 
     return nil if entity.nil?
-
     entity.first
   end
 
