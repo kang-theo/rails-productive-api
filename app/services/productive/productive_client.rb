@@ -28,8 +28,10 @@ class Productive::ProductiveClient
   end
 
   def handle_response(response)
-    if !response.success? || response.body.blank?
+    if !response.success?
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}"
+    elsif response.body.blank?
+      raise ApiRequestError, "API response is blank"
     end
 
     parsed_data = JSON.parse(response.body)['data']
