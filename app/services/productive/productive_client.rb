@@ -7,7 +7,9 @@ class Productive::ProductiveClient
   attr_accessor :entity
 
   def initialize(entity = '')
+    raise ApiRequestError, 'Entity is blank' if entity.blank?
     @entity = entity
+   
     @headers = {
       "X-Auth-Token": Rails.application.credentials.productive_api_token,
       "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
@@ -29,8 +31,6 @@ class Productive::ProductiveClient
     if !response.success? || response.body.blank?
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}"
     end
-
-    raise ApiRequestError, 'Entity is nil' if entity.nil?
 
     parsed_data = JSON.parse(response.body)['data']
     module_name = self.class.module_parent.name

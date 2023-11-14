@@ -34,7 +34,7 @@ class Productive::Base
         type = data['type']
       end
 
-      define_foreign_key_methods(type, instance_attrs[foreign_key.to_sym])
+      define_association_methods(type, instance_attrs[foreign_key.to_sym])
     end
 
     # define setters and getters for instance attributes
@@ -74,7 +74,7 @@ class Productive::Base
 
   private
 
-  def define_foreign_key_methods(type, ids)
+  def define_association_methods(type, ids)
     method_name = type.singularize
     klass = method_name.capitalize
     module_name = self.class.module_parent.name
