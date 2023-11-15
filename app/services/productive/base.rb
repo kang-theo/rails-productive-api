@@ -1,42 +1,62 @@
 # frozen_string_literal: true
 
 class Productive::Base
-  @@relations = {
-    Project: 'projects',
-    Company: 'companies',
-    Organization: 'organizations',
-    Person: 'people',
-    Membership: 'memberships'
-  }
+  # @@relations = {
+  #   Project: 'projects',
+  #   Company: 'companies',
+  #   Organization: 'organizations',
+  #   Person: 'people',
+  #   Membership: 'memberships'
+  # }
   
-  def initialize(response)
-    instance_attrs = response['attributes'].merge(id: response['id'])
 
-    response['relationships'].each do |key, value|
-      next unless value.is_a?(Hash)
+  # move to ProductiveConf
+  endpoint = 'https://api.productive.io/api/v2' 
+  auth_info = {
+    "X-Auth-Token": Rails.application.credentials.productive_api_token,
+    "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
+    "Content-Type": 'application/vnd.api+json'
+  }
 
-      data = value['data']
-      next if data.blank?
+  # class << self
+  #   attr_accessor :http_client
+  # end
+  # a better way
+  @@http_client = HttpClient.new(endpoint, auth_info)
+  def self.http_client
+    @@http_client
+  end
 
-      foreign_key = "#{key}_id"
-      type = nil
+  def initialize(attributes, foreign_key_types)
+    raise "ApiRequestError: attributes is blank" if attributes.blank?
+    raise "ApiRequestError: foreign_key_types is blank" if foreign_key_types.blank?
 
-      if data.is_a?(Array)
-        # eg. :memberships_id=>["6104455", "6104456", "6104457", "6104464"], and custome_field_people=>[]
-        instance_attrs[foreign_key.to_sym] = data.map do |datum|
-          next if datum.blank?
+    create_setter_and_getter(attributes)
+    define_association_methods(attributes, foreign_key_types)
+  end
 
-          type ||= datum['type']
-          datum['id']
-        end
-      else
-        instance_attrs[foreign_key.to_sym] = data['id']
-        type = data['type']
-      end
+  # usage: Project.all, Company.all
+  def self.all
+    req_params = "#{self.name.demodulize.downcase.pluralize}"
+    http_client.get(req_params)
+  end
 
-      define_association_methods(type, instance_attrs[foreign_key.to_sym])
-    end
+  def self.find(id)
+    raise ApiRequestError, 'Id is invalid.' if id.nil?
 
+    # lookup according to config
+    req_params = "#{self.name.demodulize.downcase.pluralize}/#{id}"
+    response = http_client.get(req_params)
+    debugger
+    parser = Productive::ProductiveParser.new(response)
+    entity = parser.handle_response
+    return nil if entity.nil?
+    entity.first
+  end
+
+  private
+
+  def create_setter_and_getter
     # define setters and getters for instance attributes
     instance_attrs.each do |key, value|
       instance_variable_set("@#{key}", value)
@@ -53,47 +73,31 @@ class Productive::Base
     end
   end
 
-  def self.client
-    raise ApiRequestError, 'Resource does not exist.' if self.name.nil?
+  def define_association_methods(attributes, types)
+    types.each do |type|
+      ids = attributes[foreign_key.to_sym]
+      method_name = type.singularize
+      klass = method_name.capitalize
+      debugger
 
-    relation_key = self.name.demodulize.to_sym
-    @@client = Productive::ProductiveClient.new(@@relations[relation_key])
-  end
-
-  # usage: Project.all, Company.all
-  def self.all
-    client.get
-  end
-
-  def self.find(id)
-    entity = client.get({ id: })
-
-    return nil if entity.nil?
-    entity.first
-  end
-
-  private
-
-  def define_association_methods(type, ids)
-    method_name = type.singularize
-    klass = method_name.capitalize
-    module_name = self.class.module_parent.name
-
-    # define association methods for company, organization, etc. according to each entity's foreign_keys
-    if ids.is_a?(Array) # define association methods for multiple memberships, etc.
-      self.class.class_eval do
-        define_method(method_name.to_sym) do
-          ids.map do |id|
-            Object.const_get(module_name + '::' + klass).find(id)
+      # define association methods for company, organization, etc. according to each entity's foreign_keys
+      if ids.is_a?(Array) # define association methods for multiple memberships, etc.
+        self.class.class_eval do
+          define_method(method_name.to_sym) do
+            ids.map do |id|
+              Object.const_get('Productive::' + klass).find(id)
+            end
+          end
+        end
+      else
+        self.class.class_eval do
+          define_method(method_name.to_sym) do
+            Object.const_get('Productive::' + klass).find(ids)
           end
         end
       end
-    else
-      self.class.class_eval do
-        define_method(method_name.to_sym) do
-          Object.const_get(module_name + '::' + klass).find(ids)
-        end
-      end
     end
+
   end
+
 end
