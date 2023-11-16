@@ -1,0 +1,17 @@
+ProductiveConf.configure do |config|
+  config.endpoint = 'https://api.productive.io/api/v2'.freeze
+
+  config.auth_info = {
+    "X-Auth-Token": Rails.application.credentials.productive_api_token,
+    "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
+    "Content-Type": 'application/vnd.api+json'
+}.freeze
+
+  config.relationships = [
+    { entity: 'Project', path: 'projects' },
+    { entity: 'Company', path: 'companies' },
+    { entity: 'Organization', path: 'organizations' },
+    { entity: 'Membership', path: 'memberships' },
+    { entity: 'People', path: 'people' },
+  ].freeze
+end

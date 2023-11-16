@@ -1,31 +1,22 @@
 # frozen_string_literal: true
 
 class Productive::Base
-  # @@relations = {
-  #   Project: 'projects',
-  #   Company: 'companies',
-  #   Organization: 'organizations',
-  #   Person: 'people',
-  #   Membership: 'memberships'
-  # }
-  
+  # entity is the value you are fining
+  # ProductiveConf.relationships.find{|relationship| relationship[:entity] == entity}
 
-  # move to ProductiveConf
-  endpoint = 'https://api.productive.io/api/v2' 
-  auth_info = {
-    "X-Auth-Token": Rails.application.credentials.productive_api_token,
-    "X-Organization-Id": Rails.application.credentials.organization_id.to_s,
-    "Content-Type": 'application/vnd.api+json'
-  }
+  @@http_client = HttpClient.new(ProductiveConf.endpoint, ProductiveConf.auth_info)
 
-  class << self
-    attr_accessor :http_client
-  end
-  # a better way
-  @@http_client = HttpClient.new(endpoint, auth_info)
   def self.http_client
     @@http_client
   end
+
+  def self.http_client=(client)
+    @@http_client = client
+  end
+
+  # class << self
+  #   attr_accessor :http_client
+  # end
 
   def initialize(attributes, foreign_key_types)
     raise "ApiRequestError: attributes is blank" if attributes.blank?
