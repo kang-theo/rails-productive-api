@@ -8,10 +8,15 @@ ProductiveConf.configure do |config|
 }.freeze
 
   config.relationships = [
-    { entity: 'Project', path: 'projects' },
-    { entity: 'Company', path: 'companies' },
-    { entity: 'Organization', path: 'organizations' },
-    { entity: 'Membership', path: 'memberships' },
-    { entity: 'People', path: 'people' },
+    # { entity: 'Project', path: 'projects' },
+    # { entity: 'Company', path: 'companies' },
+    # { entity: 'Organization', path: 'organizations' },
+    # { entity: 'Membership', path: 'memberships' },
+    # { entity: 'People', path: 'people' },
+    { type: 'projects', entity: 'Project' },
+    { type: 'companies', entity: 'Company' },
+    { type: 'organizations', entity: 'Organization' },
+    { type: 'memberships', entity: 'Membership' },
+    { type: 'people', entity: 'Person' },
   ].freeze
 end

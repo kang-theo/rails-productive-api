@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Productive
-  class Company < Base
+  class Person< Base
     def projects
       Project.find(id)
     end
