@@ -22,7 +22,6 @@ module ProductiveApi
     # config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths << Rails.root.join('lib')
     config.after_initialize do
-      require_relative '../lib/productive_conf'
       require_relative '../config/productive_conf'
     end
   end

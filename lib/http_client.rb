@@ -4,6 +4,9 @@ class HttpClient
   base_uri "https://api.productive.io/api/v2"
 
   def initialize(endpoint, auth_info)
+    raise ApiRequestError, "Invalid endpoint" unless endpoint.is_a?(String)
+    raise ApiRequestError, "Invalid Token" unless auth_info.is_a?(Hash)
+
     @endpoint = endpoint
     @headers  = auth_info
   end
