@@ -18,9 +18,9 @@ class Productive::Base
     "Content-Type": 'application/vnd.api+json'
   }
 
-  # class << self
-  #   attr_accessor :http_client
-  # end
+  class << self
+    attr_accessor :http_client
+  end
   # a better way
   @@http_client = HttpClient.new(endpoint, auth_info)
   def self.http_client
@@ -47,8 +47,7 @@ class Productive::Base
     # lookup according to config
     req_params = "#{self.name.demodulize.downcase.pluralize}/#{id}"
     response = http_client.get(req_params)
-    debugger
-    parser = Productive::ProductiveParser.new(response)
+    parser = Productive::ProductiveParser.new(response, self.name.demodulize) # refactor the module structure, instead of using a folder as a namespace
     entity = parser.handle_response
     return nil if entity.nil?
     entity.first
@@ -56,9 +55,9 @@ class Productive::Base
 
   private
 
-  def create_setter_and_getter
+  def create_setter_and_getter(attributes)
     # define setters and getters for instance attributes
-    instance_attrs.each do |key, value|
+    attributes.each do |key, value|
       instance_variable_set("@#{key}", value)
 
       self.class_eval do
@@ -75,10 +74,9 @@ class Productive::Base
 
   def define_association_methods(attributes, types)
     types.each do |type|
-      ids = attributes[foreign_key.to_sym]
+      ids = attributes[(type.singularize+'_id').to_sym]
       method_name = type.singularize
       klass = method_name.capitalize
-      debugger
 
       # define association methods for company, organization, etc. according to each entity's foreign_keys
       if ids.is_a?(Array) # define association methods for multiple memberships, etc.
