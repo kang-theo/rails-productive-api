@@ -27,6 +27,6 @@ ProductiveConf.configure do |config|
     { type: 'companies', entity: 'Company' },
     { type: 'organizations', entity: 'Organization' },
     { type: 'memberships', entity: 'Membership' },
-    { type: 'people', entity: 'Person' },
+    { type: 'people', entity: 'Person' }
   ].freeze
 end

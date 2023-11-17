@@ -1,17 +1,9 @@
 module Productive::Instance
   # instance methods for entities
   # usage: proj = Project.new()   proj.update
-  def update
+  def update; end
 
-  end
+  def archive; end
 
-  def archive
-
-  end
-
-  def restore
-
-  end
-
-
+  def restore; end
 end

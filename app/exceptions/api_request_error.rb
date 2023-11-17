@@ -1,3 +1,2 @@
 class ApiRequestError < StandardError
-  
 end
