@@ -1,20 +1,10 @@
-class HttpClient
-  include HTTParty
-  # base_uri @endpoint
-  base_uri "https://api.productive.io/api/v2"
+module HttpClient
+  @@endpoint = ProductiveConf.endpoint
+  @@headers = ProductiveConf.auth_info
 
-  def initialize(endpoint, auth_info)
-    raise ApiRequestError, "Invalid endpoint" unless endpoint.is_a?(String)
-    raise ApiRequestError, "Invalid Token" unless auth_info.is_a?(Hash)
-
-    @endpoint = endpoint
-    @headers  = auth_info
-  end
-
-  def get(req_params)
-    Rails.logger.info("HTTP Request: #{self.class.default_options[:base_uri]}/#{req_params}")
-
-    self.class.get("#{self.class.default_options[:base_uri]}/#{req_params}", headers: @headers)
+  def self.get(req_params)
+    Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
+    HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
   end
 
   # def post(uri, data)

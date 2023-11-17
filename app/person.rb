@@ -1,3 +1,0 @@
-class Person < Base
-
-end

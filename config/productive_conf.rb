@@ -1,3 +1,13 @@
+class ProductiveConf
+  class << self
+    attr_accessor :endpoint, :auth_info, :relationships
+
+    def configure
+      yield self if block_given?
+    end
+  end
+end
+
 ProductiveConf.configure do |config|
   config.endpoint = 'https://api.productive.io/api/v2'.freeze
 
@@ -19,14 +29,4 @@ ProductiveConf.configure do |config|
     { type: 'memberships', entity: 'Membership' },
     { type: 'people', entity: 'Person' },
   ].freeze
-end
-
-class ProductiveConf
-  class << self
-    attr_accessor :endpoint, :auth_info, :relationships
-
-    def configure
-      yield self if block_given?
-    end
-  end
 end

@@ -2,16 +2,6 @@
 
 module Productive
   class Base
-    @@http_client = HttpClient.new(ProductiveConf.endpoint, ProductiveConf.auth_info)
-
-    def self.http_client
-      @@http_client
-    end
-
-    # class << self
-    #   attr_accessor :http_client
-    # end
-
     def initialize(attributes, foreign_key_types)
       raise "ApiRequestError: attributes is blank" if attributes.blank?
       raise "ApiRequestError: foreign_key_types is blank" if foreign_key_types.blank?
@@ -34,7 +24,7 @@ module Productive
 
       # lookup according to config
       req_params = "#{self.name.demodulize.downcase.pluralize}/#{id}"
-      response = http_client.get(req_params)
+      response = HttpClient.get(req_params)
 
       parser = ProductiveParser.new(response, self.name.demodulize)
       entity = parser.handle_response
