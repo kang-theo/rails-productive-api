@@ -19,7 +19,9 @@ module Productive
       logger.info("HTTP Request: #{url}")
 
       opt = opt.merge(@@auth_info)
-      Request.new.get("#{url}", opt)
+      a = Request.new.get("#{url}", opt)
+      debugger
+      a
     end
 
     def self.post(url, payload = nil, opt = {})
@@ -34,6 +36,11 @@ module Productive
     # end
 
     # def self.delete(url, payload)
+    # end
+
+    # def success?
+    #   debugger
+    #   (200..299).include?(@status_code)
     # end
 
     class Error < StandardError
@@ -87,7 +94,8 @@ module Productive
         # Error
         raise HttpError.new(response.code, response.message) if response.code != '200' && response.code != '201'
 
-        response.body
+        # response.body
+        response
       rescue HttpError => e
         { 'status_code' => e.code, 'message' => e.message }
       end
@@ -186,12 +194,13 @@ module Productive
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           end
 
-          puts request
-          puts payload
+          # puts request
+          # puts payload
           request.body =
             response = http.request(request, payload)
 
           if response.code == '200' || response.code == '201'
+            # @@response.code = response.code.to_i
             logger.debug "#{response.code} #{response.message}"
             logger.debug "  content_type: #{response.content_type}, content_length: #{response.content_length}"
             # break return response

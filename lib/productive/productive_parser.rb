@@ -2,15 +2,6 @@
 
 module Productive
   module ProductiveParser
-    # attr_accessor :instance_attrs, :instance_klass, :foreign_key_types, :parsed_data
-
-
-    #   @instance_attrs = {}
-    #   @instance_klass = instance_klass
-    #   @foreign_key_types = []
-    #   @parsed_data = JSON.parse(response.body)['data'] # exception
-    # end
-
     @@instance_attrs = {}
     @@foreign_key_types = []
     
@@ -18,17 +9,9 @@ module Productive
       @@instance_attrs
     end
     
-    # def self.update_instance_attrs(key, value)
-    #   @@instance_attrs[key] = value
-    # end
-
     def self.foreign_key_types
       @@foreign_key_types
     end
-
-    # def self.foreign_key_types=(types)
-    #   @@foreign_key_types = types
-    # end
 
     def self.handle_response(response, instance_klass)
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
@@ -57,6 +40,7 @@ module Productive
     def self.parse_attributes_and_types(data)
       instance_attrs[:id] = data['id']
       instance_attrs.merge!(data['attributes'])
+
       data['relationships'].each do |_key, value|
         next unless value.is_a?(Hash)
 
@@ -64,6 +48,8 @@ module Productive
         next if data.blank?
 
         if data.is_a?(Array)
+          next if data.empty? || data.first.blank?
+
           # eg. :memberships_id=>["6104455", "6104456", "6104457", "6104464"], and custome_field_people=>[]
           type = data.first['type']
           foreign_key_types.push(type)
@@ -73,6 +59,8 @@ module Productive
             datum['id']
           end
         else
+          next if data.blank?
+
           # "project_manager"=>{"data"=>{"type"=>"people", "id"=>"412034"}}, multiple people
           type = data['type']
           foreign_key_types.push(type)
