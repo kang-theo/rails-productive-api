@@ -20,19 +20,15 @@ module Productive
       parsed_data = JSON.parse(response.body)['data']
       instance_results = []
 
-      if parsed_data.is_a?(Array)
-        parsed_data.map do |datum|
-          foreign_key_types.clear
-          parse_attributes_and_types(datum)
+      flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
+      flatten_data.each do |datum|
+        foreign_key_types.clear
+        parse_attributes_and_types(datum)
 
-          klass = "Productive::#{instance_klass}".constantize
-          instance_results.push(klass.new(instance_attrs, foreign_key_types))
-        end
-      else
-        parse_attributes_and_types(parsed_data)
         klass = "Productive::#{instance_klass}".constantize
         instance_results.push(klass.new(instance_attrs, foreign_key_types))
       end
+      instance_results
     end
 
     private
@@ -50,7 +46,7 @@ module Productive
         if data.is_a?(Array)
           next if data.empty? || data.first.blank?
 
-          # eg. :memberships_id=>["6104455", "6104456", "6104457", "6104464"], and custome_field_people=>[]
+          # eg. "memberships_id": ["6104455", "6104456", "6104457", "6104464"]
           type = data.first['type']
           foreign_key_types.push(type)
 
@@ -61,7 +57,7 @@ module Productive
         else
           next if data.blank?
 
-          # "project_manager"=>{"data"=>{"type"=>"people", "id"=>"412034"}}, multiple people
+          # eg. "project_manager": {"data"=>{"type"=>"people", "id"=>"412034"}}
           type = data['type']
           foreign_key_types.push(type)
 

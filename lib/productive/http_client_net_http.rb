@@ -32,16 +32,15 @@ module Productive
       Request.new.patch(url, payload, opt)
     end
 
-    # def self.put(url, payload={}, opt={})
-    # end
+    def self.put(url, payload={}, opt={})
+    end
 
-    # def self.delete(url, payload)
-    # end
+    def self.delete(url, payload)
+    end
 
-    # def success?
-    #   debugger
-    #   (200..299).include?(@status_code)
-    # end
+    def success?
+      (200..299).include?(@status_code)
+    end
 
     class Error < StandardError
     end

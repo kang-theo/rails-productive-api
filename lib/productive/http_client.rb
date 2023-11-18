@@ -8,18 +8,18 @@ module Productive
       HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
     end
 
-    # def post(uri, data)
-    #   @options[:body] = data.to_json
-    #   self.class.post(uri, @options)
-    # end
+    def post(req_params, data)
+      @options[:body] = data.to_json
+      HTTParty.post(uri, @options)
+    end
 
-    # def put(uri, data)
-    #   @options[:body] = data.to_json
-    #   self.class.put(uri, @options)
-    # end
+    def put(req_params, data)
+      @options[:body] = data.to_json
+      HTTParty.put(uri, @options)
+    end
 
-    # def delete(uri)
-    #   self.class.delete(uri, @options)
-    # end
+    def delete(req_params)
+      HTTParty.delete(uri, @options)
+    end
   end
 end

@@ -10,30 +10,10 @@ module Productive
       define_associations(attributes, foreign_key_types)
     end
 
-    # usage: Project.all, Company.all
-    def self.all
-      req_params = "#{name.demodulize.downcase.pluralize}" # refactor self.name.demodulize
-      response = HttpClient.get(req_params)
-
-      entity = ProductiveParser.handle_response(response, name.demodulize) # refactor self.name.demodulize
-    end
-
-    def self.find(id)
-      raise ApiRequestError, 'Id is invalid.' if id.nil?
-
-      # lookup according to config
-      req_params = "#{name.demodulize.downcase.pluralize}/#{id}"
-      response = HttpClient.get(req_params)
-
-      entity = ProductiveParser.handle_response(response, name.demodulize)
-
-      entity.first unless entity.nil?
-    end
-
     private
 
+    # instance attributes
     def create_accessors(attributes)
-      # define setters and getters for instance attributes
       attributes.each do |key, value|
         instance_variable_set("@#{key}", value)
 
