@@ -1,7 +1,7 @@
 module Productive
   module HttpClient
-    @@endpoint = ProductiveConf.endpoint
-    @@headers = ProductiveConf.auth_info
+    @@endpoint = PRODUCTIVE_CONF['endpoint']
+    @@headers = PRODUCTIVE_CONF['auth_info']
 
     def self.get(req_params)
       Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")

@@ -1,0 +1,3 @@
+development:
+  endpoint: 'https://api.productive.io/api/v2'
+  auth_info: {"X-Auth-Token": <%= Rails.application.credentials.productive_api_token %>, "X-Organization-Id": "<%= Rails.application.credentials.organization_id %>", "Content-Type": 'application/vnd.api+json'}

@@ -10,7 +10,9 @@ module Productive
     module Klass
       # usage: Project.all
       def all
-        req_params = "#{name.demodulize.downcase.pluralize}" # refactor self.name.demodulize
+        target = ProductiveConf.req_params_mapping.find { |map| map[:entity] == self.name }
+
+        req_params = target[:path]
         response = HttpClient.get(req_params)
 
         entity = Parser.handle_response(response)
@@ -20,7 +22,9 @@ module Productive
         raise ApiRequestError, 'Id is invalid.' if id.nil?
 
         # lookup according to config
-        req_params = "#{name.demodulize.downcase.pluralize}/#{id}"
+        target = ProductiveConf.req_params_mapping.find { |map| map[:entity] == self.name }
+
+        req_params = "#{target[:path]}/#{id}"
         response = HttpClient.get(req_params)
 
         entity = Parser.handle_response(response)

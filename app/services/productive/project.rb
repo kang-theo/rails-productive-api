@@ -2,9 +2,6 @@
 
 module Productive
   class Project < Base
-    # extend Common
-    # include Common
-
     def self.copy; end
 
     #   def self.find_all_by_company(company_id)

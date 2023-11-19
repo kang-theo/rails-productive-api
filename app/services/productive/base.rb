@@ -15,7 +15,7 @@ module Productive
 
     private
 
-    # instance attributes
+    # for instance attributes
     def create_accessors(attributes)
       attributes.each do |key, value|
         instance_variable_set("@#{key}", value)
