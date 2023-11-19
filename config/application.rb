@@ -21,5 +21,13 @@ module ProductiveApi
     # config.eager_load_paths << Rails.root.join("lib")
     # config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths << Rails.root.join('lib')
+    config.cache_store = :redis_store, {
+      host: 'localhost',
+      port: 6379,
+      db: 0,
+      namespace: 'cache',
+      expires_in: 1.hour
+    }
+
   end
 end

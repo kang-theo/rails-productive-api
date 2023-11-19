@@ -36,7 +36,10 @@ class Api::V2::ProjectsController < ApplicationController
     # ProjectAttr.new({ "name": "test project", "number": "1", "project_number": "1", "project_type_id": "2", "project_color_id": "null", "last_activity_at": "2023-10-23T06:10:48.000+02:00", "public_access": true, "time_on_tasks": true, "tag_colors": {}, "archived_at": "null", "created_at": "2023-10-23T06:10:48.107+02:00", "template": false, "budget_closing_date": "null", "needs_invoicing": false, "custom_fields": "null", "task_custom_fields_ids": "null", "sample_data": false })
 
     # 5. exception
-    project_api = ProductiveClient.new('projects')
-    project = project_api.find(385_780)
+    # project_api = ProductiveClient.new('projects')
+    # project = project_api.find(385_780)
+
+    # 6. redis
+    project = Productive::Project.find(314500)
   end
 end

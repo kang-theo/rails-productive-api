@@ -4,8 +4,21 @@ module Productive
     @@headers = PRODUCTIVE_CONF['auth_info']
 
     def self.get(req_params)
-      Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
-      HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
+      cache_key = "httparty_cache/#{req_params}"
+
+      cached_result = Rails.cache.read(cache_key)
+
+      if cached_result.nil?
+        Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
+        response = HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
+
+        Rails.cache.write(cache_key, response, expires_in: 1.hour)
+
+        return response
+      else
+        Rails.logger.info("Cached result found for #{cache_key}")
+        return cached_result
+      end
     end
 
     def post(req_params, data)
