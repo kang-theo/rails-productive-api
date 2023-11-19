@@ -2,17 +2,23 @@
 
 module Productive
   module Common
-    def self.included base            
+    def self.included(base)
       base.extend Klass
       base.include Instance
     end
 
     module Klass
+      # self.extended instead
+      def path
+        @path ||= begin
+          config = PRODUCTIVE_CONF['req_params']
+          config.find { |param| param['entity'] == name }['path']
+        end
+      end
+
       # usage: Project.all
       def all
-        target = ProductiveConf.req_params_mapping.find { |map| map[:entity] == self.name }
-
-        req_params = target[:path]
+        req_params = path
         response = HttpClient.get(req_params)
 
         entity = Parser.handle_response(response)
@@ -21,10 +27,7 @@ module Productive
       def find(id)
         raise ApiRequestError, 'Id is invalid.' if id.nil?
 
-        # lookup according to config
-        target = ProductiveConf.req_params_mapping.find { |map| map[:entity] == self.name }
-
-        req_params = "#{target[:path]}/#{id}"
+        req_params = "#{path}/#{id}"
         response = HttpClient.get(req_params)
 
         entity = Parser.handle_response(response)

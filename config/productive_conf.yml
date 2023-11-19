@@ -1,3 +1,35 @@
 development:
   endpoint: 'https://api.productive.io/api/v2'
   auth_info: {"X-Auth-Token": <%= Rails.application.credentials.productive_api_token %>, "X-Organization-Id": "<%= Rails.application.credentials.organization_id %>", "Content-Type": 'application/vnd.api+json'}
+  # auth_info:
+  #   X-Auth-Token: <%= Rails.application.credentials.production_productive_api_token %>
+  #   X-Organization-Id: "<%= Rails.application.credentials.production_organization_id.to_s %>"
+  #   Content-Type: 'application/vnd.api+json'
+
+  relationships:
+    - type: 'projects'
+      entity: 'Project'
+    - type: 'companies'
+      entity: 'Company'
+    - type: 'organizations'
+      entity: 'Organization'
+    - type: 'memberships'
+      entity: 'Membership'
+    - type: 'people'
+      entity: 'Person'
+    - type: 'workflows'
+      entity: 'Workflow'
+
+  req_params:
+    - entity: 'Productive::Project'
+      path: 'projects'
+    - entity: 'Productive::Company'
+      path: 'companies'
+    - entity: 'Productive::Organization'
+      path: 'organizations'
+    - entity: 'Productive::Membership'
+      path: 'memberships'
+    - entity: 'Productive::People'
+      path: 'people'
+    - entity: 'Productive::Workflow'
+      path: 'workflows'

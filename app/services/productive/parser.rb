@@ -14,6 +14,7 @@ module Productive
       @@foreign_key_types
     end
 
+    # base: the class that includes this module
     def self.included base
       @@instance_class = base
     end
@@ -35,6 +36,7 @@ module Productive
         parse_attributes_and_types(datum)
 
         # creating instances
+        puts instance_class
         entity = instance_class.new(instance_attrs, foreign_key_types)
         instance_results.push(entity)
       end

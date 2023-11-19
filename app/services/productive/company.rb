@@ -2,6 +2,8 @@
 
 module Productive
   class Company < Base
+    include Parser
+
     def projects
       Project.find(id)
     end

@@ -3,7 +3,6 @@
 module Productive
   class Base
     include Common
-    include Parser
 
     def initialize(attributes, foreign_key_types)
       raise 'ApiRequestError: attributes is blank' if attributes.blank?
@@ -21,40 +20,29 @@ module Productive
         instance_variable_set("@#{key}", value)
 
         class_eval do
-          define_method(key) do
-            instance_variable_get("@#{key}")
-          end
-
-          define_method("#{key}=") do |value|
-            instance_variable_set("@#{key}", value)
-          end
+          define_method(key) { instance_variable_get("@#{key}") }
+          define_method("#{key}=") { |value| instance_variable_set("@#{key}", value) }
         end
       end
     end
 
-    def define_associations(attributes, types) # type parse
+    # for associative queries
+    def define_associations(attributes, types)
       types.each do |type|
-        method_name = type.singularize
-        ids = attributes[(method_name + '_id').to_sym]
+        config = PRODUCTIVE_CONF['relationships']
+        type_hash = config.find { |relationship| relationship['type'] == type }
+        raise ApiRequestError, 'Undefined type.' if type_hash.nil?
 
-        # lookup the configured relationship
-        target = ProductiveConf.relationships.find { |relationship| relationship[:type] == type }
-        klass = "Productive::#{target[:entity]}".constantize unless target.nil?
+        klass = type_hash['entity']
+        method_name = klass.downcase
+        ids = attributes["#{method_name}_id".to_sym]
 
         # define association methods for company, organization, etc.
-        if ids.is_a?(Array) # define association methods for multiple memberships, etc.
-          self.class.class_eval do
-            define_method(method_name.to_sym) do
-              ids.map do |id|
-                klass.find(id)
-              end
-            end
-          end
-        else
-          self.class.class_eval do
-            define_method(method_name.to_sym) do
-              klass.find(ids)
-            end
+        flatten_ids = ids.is_a?(Array)? ids : [ids]
+        self.class_eval do
+          define_method(method_name.to_sym) do
+            klass = "Productive::#{klass}"
+            flatten_ids.each { |id| klass.constantize.find(id) }
           end
         end
       end
