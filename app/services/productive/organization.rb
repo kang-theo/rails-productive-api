@@ -2,9 +2,18 @@
 
 module Productive
   class Organization < Base
-    def projects
-      # Project.Organization(id)
-      # Project.Company(id)
+    include Parser
+
+    def people # owner
+
+    end
+
+    def companies
+
+    end
+
+    def organization_subscription
+
     end
   end
 end
