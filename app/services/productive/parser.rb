@@ -36,7 +36,6 @@ module Productive
         parse_attributes_and_types(datum)
 
         # creating instances
-        puts instance_class
         entity = instance_class.new(instance_attrs, foreign_key_types)
         instance_results.push(entity)
       end
