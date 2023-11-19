@@ -2,6 +2,9 @@
 
 module Productive
   class Base
+    include Common
+    include Parser
+
     def initialize(attributes, foreign_key_types)
       raise 'ApiRequestError: attributes is blank' if attributes.blank?
       raise 'ApiRequestError: foreign_key_types is blank' if foreign_key_types.blank?

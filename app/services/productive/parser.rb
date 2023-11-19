@@ -34,7 +34,8 @@ module Productive
         foreign_key_types.clear
         parse_attributes_and_types(datum)
 
-        instance_results.push(instance_class.new(instance_attrs, foreign_key_types))
+        entity = instance_class.new(instance_attrs, foreign_key_types)
+        instance_results.push(entity)
       end
       instance_results
     end

@@ -2,9 +2,8 @@
 
 module Productive
   class Project < Base
-    # include Productive
-    extend Common
-    include Parser
+    # extend Common
+    # include Common
 
     def self.copy; end
 
