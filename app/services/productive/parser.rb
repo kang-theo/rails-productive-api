@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module Productive
-  module ProductiveParser
+  module Parser
     @@instance_attrs = {}
     @@foreign_key_types = []
+    @@instane_class = nil
     
     def self.instance_attrs
       @@instance_attrs
@@ -13,7 +14,15 @@ module Productive
       @@foreign_key_types
     end
 
-    def self.handle_response(response, instance_klass)
+    def self.included base
+      @@instance_class = base
+    end
+
+    def self.instance_class
+      @@instance_class
+    end
+
+    def self.handle_response(response)
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
       raise ApiRequestError, "API response is blank" if response.body.blank?
         
@@ -25,8 +34,7 @@ module Productive
         foreign_key_types.clear
         parse_attributes_and_types(datum)
 
-        klass = "Productive::#{instance_klass}".constantize
-        instance_results.push(klass.new(instance_attrs, foreign_key_types))
+        instance_results.push(instance_class.new(instance_attrs, foreign_key_types))
       end
       instance_results
     end
@@ -43,25 +51,17 @@ module Productive
         data = value['data']
         next if data.blank?
 
-        if data.is_a?(Array)
-          next if data.empty? || data.first.blank?
+        flatten_data = data.is_a?(Array) ? data : [data]
+        next if flatten_data.empty? || flatten_data.first.blank?
 
-          # eg. "memberships_id": ["6104455", "6104456", "6104457", "6104464"]
-          type = data.first['type']
-          foreign_key_types.push(type)
+        # eg. "memberships_id": ["6104455", "6104456", "6104457", "6104464"]
+        #     "project_manager": {"data"=>{"type"=>"people", "id"=>"412034"}}
+        type = flatten_data.first['type']
+        foreign_key_types.push(type)
 
-          instance_attrs[(type.singularize + '_id').to_sym] = data.map do |datum|
-            next if datum.blank?
-            datum['id']
-          end
-        else
-          next if data.blank?
-
-          # eg. "project_manager": {"data"=>{"type"=>"people", "id"=>"412034"}}
-          type = data['type']
-          foreign_key_types.push(type)
-
-          instance_attrs[(type.singularize + '_id').to_sym] = data['id']
+        instance_attrs[(type.singularize + '_id').to_sym] = flatten_data.map do |datum|
+          next if datum.blank?
+          datum['id']
         end
       end
     end
