@@ -2,7 +2,10 @@
 
 module Productive
   class Company < Base
+    include ActiveModel::Validations
     include Parser
+
+    validates :company_code, :projcetless_budgets, presence: true
 
     def projects
       associative_query(Project, project_id)

@@ -2,7 +2,11 @@
 
 module Productive
   class Base
+    include ActiveModel::Validations
     include Common
+
+    # obj.valid: to check if all the required fields are present
+    validates :id, :name, :number, :created_at, :last_activity, presence: true
 
     def initialize(attributes, foreign_key_types)
       raise 'ApiRequestError: attributes is blank' if attributes.blank?

@@ -2,7 +2,11 @@
 
 module Productive
   class Project < Base
+    include ActiveModel::Validations
     include Parser
+
+    # obj.valid: to check if all the required fields are present
+    validates :project_number, :project_type_id, :public_access, presence: true
 
     def organizations
       associative_query(Organization, organization_id)

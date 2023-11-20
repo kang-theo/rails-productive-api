@@ -2,7 +2,10 @@
 
 module Productive
   class Membership < Base
+    include ActiveModel::Validations
     include Parser
+
+    validates :access_type_id, :type_id, :target_type, presence: true
 
     def organizations
       associative_query(Organization, organization_id)
