@@ -32,7 +32,6 @@ module Productive
 
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
       flatten_data.each do |datum|
-        foreign_key_types.clear
         parse_attributes_and_types(datum)
 
         # creating instances
@@ -45,6 +44,9 @@ module Productive
     private
 
     def self.parse_attributes_and_types(data)
+      instance_attrs.clear
+      foreign_key_types.clear
+
       instance_attrs[:id] = data['id']
       instance_attrs.merge!(data['attributes'])
 
