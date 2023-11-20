@@ -2,7 +2,6 @@
 
 module Productive
   class Project < Base
-    include ActiveModel::Validations
     include Parser
 
     # obj.valid: to check if all the required fields are present

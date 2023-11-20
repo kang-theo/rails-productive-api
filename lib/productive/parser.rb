@@ -4,7 +4,6 @@ module Productive
   module Parser
     @@instance_attrs = {}
     @@foreign_key_types = []
-    @@instane_class = nil
     
     def self.instance_attrs
       @@instance_attrs

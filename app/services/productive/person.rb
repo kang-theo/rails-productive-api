@@ -2,7 +2,6 @@
 
 module Productive
   class Person < Base
-    include ActiveModel::Validations
     include Parser
 
     validates :first_name, :last_name, :email, presence: true

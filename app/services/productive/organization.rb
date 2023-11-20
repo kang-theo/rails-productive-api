@@ -2,7 +2,6 @@
 
 module Productive
   class Organization < Base
-    include ActiveModel::Validations
     include Parser
 
     validates :organization_type_id, :invitation_token, :email_key, :verified_at, presence: true
