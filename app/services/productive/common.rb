@@ -10,10 +10,11 @@ module Productive
     module Klass
       # self.extended instead
       def path
-        @path ||= begin
-          config = PRODUCTIVE_CONF['req_params']
-          config.find { |param| param['entity'] == name }['path']
-        end
+        config = PRODUCTIVE_CONF['req_params']
+        entity_config = config.find { |param| param['entity'] == name }
+        raise "Entity config not found: #{name}" if entity_config.nil?
+
+        @path ||= entity_config['path']
       end
 
       # usage: Project.all
@@ -21,11 +22,11 @@ module Productive
         req_params = path
         response = HttpClient.get(req_params)
 
-        entity = Parser.handle_response(response)
+        Parser.handle_response(response)
       end
 
       def find(id)
-        raise ApiRequestError, 'Id is invalid.' if id.nil?
+        raise ApiRequestError, 'Entity id is invalid.' if id.nil?
 
         req_params = "#{path}/#{id}"
         response = HttpClient.get(req_params)
