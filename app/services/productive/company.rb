@@ -5,15 +5,17 @@ module Productive
     include Parser
 
     def projects
-      project_id.map do |id|
-        Project.find(id)
-      end
+      associative_query(Project, project_id)
     end
 
     def organizations
-      organization_id.map do |id|
-        Organization.find(id)
-      end
+      associative_query(Organization, organization_id)
+    end
+
+    private
+
+    def associative_query(klass, ids)
+      ids.map { |id| klass.find(id) }
     end
   end
 end

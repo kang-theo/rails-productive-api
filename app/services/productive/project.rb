@@ -5,40 +5,29 @@ module Productive
     include Parser
 
     def organizations
-      organization_id.map do |id|
-        Organization.find(id)
-      end
+      associative_query(Organization, organization_id)
     end
 
     def companies
-      company_id.map do |id|
-        Company.find(id)
-      end
+      associative_query(Company, company_id)
     end
 
     def memberships
-      membership_id.map do |id|
-        Membership.find(id)
-      end
+      associative_query(Membership, membership_id)
     end
 
     def people
-      person_id.map do |id|
-        Person.find(id)
-      end
+      associative_query(Person, person_id)
     end
 
     def workflows
-      workflow_id.map do |id|
-        Productive::Workflow.find(id)
-      end
+      associative_query(Workflow, workflow_id)
     end
 
-    #   def self.find_all_by_company(company_id)
+    private
 
-    #     data.each do |item|
-    #       if item.relationships.company.data.id ===company_id
-    #     end
-    #   end
+    def associative_query(klass, ids)
+      ids.map { |id| klass.find(id) }
+    end
   end
 end

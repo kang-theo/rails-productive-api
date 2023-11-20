@@ -46,6 +46,8 @@ gem 'falcon'
 gem 'httparty'
 gem 'logutils', '~> 0.6.1'
 gem 'redis'
+# gem 'redis-store'
+# gem 'redis-rails'
 
 # Use Sass to process CSS
 # gem "sassc-rails"
