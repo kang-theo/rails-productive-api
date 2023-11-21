@@ -2,27 +2,18 @@
 
 module Productive
   module Parser
-    @@instance_attrs = {} # TODO: do not use global class variables
-    @@foreign_key_types = []
-    
-    def self.instance_attrs
-      @@instance_attrs
-    end
-    
-    def self.foreign_key_types
-      @@foreign_key_types
+    extend self
+
+    attr_accessor :instance_attrs, :foreign_key_types, :instance_class
+    @instance_attrs = {}
+    @foreign_key_types = []
+    @instance_class = nil
+
+    def included(base)
+      self.instance_class = base
     end
 
-    # base: the class that includes this module
-    def self.included base # TODO: use new style of included
-      @@instance_class = base
-    end
-
-    def self.instance_class
-      @@instance_class
-    end
-
-    def self.handle_response(response)
+    def handle_response(response)
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
       raise ApiRequestError, "API response is blank" if response.body.blank?
       
@@ -48,9 +39,9 @@ module Productive
 
     private
 
-    def self.parse_attributes_and_types(data)
-      instance_attrs.clear # TODO: no
-      foreign_key_types.clear
+    def parse_attributes_and_types(data)
+      self.instance_attrs.clear # TODO: no
+      self.foreign_key_types.clear
 
       instance_attrs[:id] = data['id']
       instance_attrs.merge!(data['attributes'])
