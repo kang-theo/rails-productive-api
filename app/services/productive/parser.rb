@@ -2,7 +2,7 @@
 
 module Productive
   module Parser
-    @@instance_attrs = {}
+    @@instance_attrs = {} # TODO: do not use global class variables
     @@foreign_key_types = []
     
     def self.instance_attrs
@@ -14,7 +14,7 @@ module Productive
     end
 
     # base: the class that includes this module
-    def self.included base
+    def self.included base # TODO: use new style of included
       @@instance_class = base
     end
 
@@ -24,8 +24,8 @@ module Productive
 
     def self.handle_response(response)
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
-      raise ApiRequestError, "API response is blank" if response.body.blank?
-        
+      raise ApiRequestError, "API response is blank" if response.body.blank? || response.body.blank?
+      
       parsed_data = JSON.parse(response.body)['data']
       instance_results = []
 
@@ -43,7 +43,7 @@ module Productive
     private
 
     def self.parse_attributes_and_types(data)
-      instance_attrs.clear
+      instance_attrs.clear # TODO: no
       foreign_key_types.clear
 
       instance_attrs[:id] = data['id']
@@ -63,7 +63,8 @@ module Productive
         type = flatten_data.first['type']
         foreign_key_types.push(type)
 
-        instance_attrs[(type.singularize + '_id').to_sym] = flatten_data.map do |datum|
+        # TODO: id should be conformed to the convention
+        instance_attrs[(type.singularize + '_id').to_sym] = flatten_data.map do |datum| # TODO: to many loop and if, need to be concise
           next if datum.blank?
           datum['id']
         end

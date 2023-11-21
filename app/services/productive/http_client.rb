@@ -12,7 +12,7 @@ module Productive
         Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
         response = HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
 
-        Rails.cache.write(cache_key, response, expires_in: 1.hour)
+        Rails.cache.write(cache_key, response, expires_in: 1.hour) # TODO: think of refresh after post
 
         return response
       else
