@@ -4,7 +4,7 @@ module Productive
   module Common
     def self.included(base) # TODO: use new style of included
       base.extend Klass
-      base.include Instance
+      # base.include Instance
     end
 
     module Klass

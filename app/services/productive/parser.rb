@@ -24,12 +24,18 @@ module Productive
 
     def self.handle_response(response)
       raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
-      raise ApiRequestError, "API response is blank" if response.body.blank? || response.body.blank?
+      raise ApiRequestError, "API response is blank" if response.body.blank?
       
-      parsed_data = JSON.parse(response.body)['data']
-      instance_results = []
+      begin
+        parsed_data = JSON.parse(response.body)['data']
+      rescue JSON::ParserError => e
+        Rails.logger.error "JSON::ParserError: #{e.message}"
+        render json: { error: 'JSON::ParserError' }, status: :bad_data
+      end
 
+      instance_results = []
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
+
       flatten_data.each do |datum|
         parse_attributes_and_types(datum)
 

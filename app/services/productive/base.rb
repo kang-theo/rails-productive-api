@@ -9,6 +9,7 @@ module Productive
       raise 'ApiRequestError: foreign_key_types is blank' if foreign_key_types.blank?
 
       create_accessors(attributes)
+      define_associations(attributes, foreign_key_types)
     end
 
     private
@@ -25,22 +26,24 @@ module Productive
       end
     end
 
+    # TODO: refactor the method
     # for associative queries
     def define_associations(attributes, types)
       types.each do |type|
         config = PRODUCTIVE_CONF['relationships']
-        type_hash = config.find { |relationship| relationship['type'] == type }
-        raise ApiRequestError, 'Undefined type.' if type_hash.nil?
+        type_config = config.find { |relationship| relationship['type'] == type }
+        raise ApiRequestError, 'Undefined type.' if type_config.nil?
 
-        klass = type_hash['entity']
-        method_name = klass.downcase
+        entity = type_config['entity']
+        method_name = entity.downcase
         ids = attributes["#{method_name}_id".to_sym] # TODO: id || ids
 
         # define association methods for company, organization, etc.
         flatten_ids = ids.is_a?(Array)? ids : [ids]
         self.class_eval do
           define_method(method_name.to_sym) do
-            klass = "Productive::#{klass}"
+            debugger
+            klass = "Productive::#{entity}"
             flatten_ids.each { |id| klass.constantize.find(id) }
           end
         end

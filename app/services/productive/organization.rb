@@ -2,6 +2,6 @@
 
 module Productive
   class Organization < Base
-    include Parser # move to Base
+    include Parser
   end
 end

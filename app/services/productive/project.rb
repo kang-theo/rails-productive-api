@@ -2,6 +2,6 @@
 
 module Productive
   class Project < Base
-    include Parser
+    include Parser # TODO: move to Base
   end
 end
