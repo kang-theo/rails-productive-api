@@ -9,6 +9,6 @@ class ApplicationController < ActionController::Base
 
   def handle_api_response_exception(exception)
     logger.error "APIResponseError: #{exception.message}"
-    render json: { error: 'API Response Error' }, status: :bad_data
+    render json: { error: 'API Response Error' }, status: :bad_response
   end
 end

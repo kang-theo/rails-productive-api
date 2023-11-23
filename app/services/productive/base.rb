@@ -3,13 +3,14 @@
 module Productive
   class Base
     include Common
+    include Parser
 
-    def initialize(attributes, foreign_key_types)
+    def initialize(attributes, association_types)
       raise 'ApiRequestError: attributes is blank' if attributes.blank?
-      raise 'ApiRequestError: foreign_key_types is blank' if foreign_key_types.blank?
+      raise 'ApiRequestError: association_types is blank' if association_types.blank?
 
       create_accessors(attributes)
-      define_associations(attributes, foreign_key_types)
+      # define_associations(attributes, association_types)
     end
 
     private
@@ -39,10 +40,9 @@ module Productive
         ids = attributes["#{method_name}_id".to_sym] # TODO: id || ids
 
         # define association methods for company, organization, etc.
-        flatten_ids = ids.is_a?(Array)? ids : [ids]
+        flatten_ids = Array(ids)
         self.class_eval do
           define_method(method_name.to_sym) do
-            debugger
             klass = "Productive::#{entity}"
             flatten_ids.each { |id| klass.constantize.find(id) }
           end

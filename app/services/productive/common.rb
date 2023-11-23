@@ -2,6 +2,8 @@
 
 module Productive
   module Common
+    # include Parser
+
     def self.included(base) # TODO: use new style of included
       base.extend Klass
       # base.include Instance
@@ -20,14 +22,14 @@ module Productive
       # usage: Project.all
       def all
         response = HttpClient.get(path)
-        Parser.handle_response(response)
+        Parser.handle_response(response, self)
       end
 
       def find(id)
         raise ApiRequestError, 'Entity id is invalid.' if id.nil?
 
         response = HttpClient.get("#{path}/#{id}")
-        entity = Parser.handle_response(response)
+        entity = Parser.handle_response(response, self)
 
         return nil if entity.empty?
         entity.first
