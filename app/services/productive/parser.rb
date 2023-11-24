@@ -16,29 +16,45 @@ module Productive
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
       entities = flatten_data.map do |data_hash|
-        # parse entity attributes
-        attributes = data_hash['attributes'].merge(id: data_hash['id'])
-
-        relationships_hash = data_hash['relationships']
-        relationships_hash.each do |key, value|
-          data = value["data"]
-          next if data.blank?
-
-          if data.is_a?(Array)
-            attributes["#{key.singularize}_ids"] = data.map { |data| data["id"] }
-          else
-            attributes["#{key.singularize}_id"] = data["id"]
-          end
-        end
-      
-        # parse association_types
-        association_types = relationships_hash.keys
+        association_info = parse_associations_info(data_hash)
+        attributes = parse_attributes(data_hash, association_info)
 
         # create instances
-        klass.new(attributes, association_types)
+        klass.new(attributes, association_info)
       end
 
       entities
+    end
+
+    private
+
+    def self.parse_associations_info(data_hash)
+      association_info = {}
+
+      relationships = data_hash['relationships']
+      relationships.each do |key, value|
+        data = value["data"]
+        next if data.blank?
+
+        flatten_data = data.is_a?(Array) ? data : [data]
+        association_info[key] = flatten_data.map { |flatten_data| flatten_data["id"] }
+      end
+
+      association_info
+    end
+
+    def self.parse_attributes(data_hash, association_info)
+      attributes = data_hash['attributes'].merge(id: data_hash['id'])
+
+      association_info.each do |key, value|
+        if value.is_a?(Array) 
+          attributes["#{key.singularize}_ids"] = value
+        else
+          attributes["#{key.singularize}_id"] = value
+        end
+      end
+
+      attributes
     end
   end
 end

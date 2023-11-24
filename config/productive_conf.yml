@@ -2,30 +2,36 @@ development:
   endpoint: 'https://api.productive.io/api/v2'
   auth_info: {"X-Auth-Token": <%= Rails.application.credentials.productive_api_token %>, "X-Organization-Id": "<%= Rails.application.credentials.organization_id %>", "Content-Type": 'application/vnd.api+json'}
 
-  relationships:
-    - type: 'projects'
-      entity: 'Project'
-    - type: 'companies'
-      entity: 'Company'
-    - type: 'organizations'
-      entity: 'Organization'
-    - type: 'memberships'
-      entity: 'Membership'
-    - type: 'people'
-      entity: 'Person'
-    - type: 'workflows'
-      entity: 'Workflow'
+  # relationships:
+  #   - type: 'project'
+  #     entity: Productive::Project
+  #   - type: 'company'
+  #     entity: Productive::Company
+  #   - type: 'organization'
+  #     entity: Productive::Organization
+  #   - type: 'memberships'
+  #     entity: Productive::Membership
+  #   - type: 'workflow'
+  #     entity: Productive::Workflow
+  #   - type: 'project_manager'
+  #     entity: Productive::Person
+  #   - type: 'last_actor'
+  #     entity: Productive::Person
+  #   - type: 'person'
+  #     entity: Productive::Person
+  #   - type: 'owner'
+  #     entity: Productive::Person
 
-  req_params:
-    - entity: 'Productive::Project'
-      path: 'projects'
-    - entity: 'Productive::Company'
-      path: 'companies'
-    - entity: 'Productive::Organization'
-      path: 'organizations'
-    - entity: 'Productive::Membership'
-      path: 'memberships'
-    - entity: 'Productive::People'
-      path: 'people'
-    - entity: 'Productive::Workflow'
-      path: 'workflows'
+  # req_params:
+  #   - entity: 'Productive::Project'
+  #     path: 'projects'
+  #   - entity: 'Productive::Company'
+  #     path: 'companies'
+  #   - entity: 'Productive::Organization'
+  #     path: 'organizations'
+  #   - entity: 'Productive::Membership'
+  #     path: 'memberships'
+  #   - entity: 'Productive::People'
+  #     path: 'people'
+  #   - entity: 'Productive::Workflow'
+  #     path: 'workflows'

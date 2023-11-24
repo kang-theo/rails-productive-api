@@ -2,24 +2,36 @@
 
 module Productive
   module Common
-    # include Parser
+    # const definition
+    RELATIONSHIPS = [
+      { type: 'project',         entity: 'Productive::Project'      },
+      { type: 'company',         entity: 'Productive::Company'      },
+      { type: 'organization',    entity: 'Productive::Organization' },
+      { type: 'memberships',     entity: 'Productive::Membership'   },
+      { type: 'workflow',        entity: 'Productive::Workflow'     },
+      { type: 'project_manager', entity: 'Productive::Person'       },
+      { type: 'last_actor',      entity: 'Productive::Person'       },
+      { type: 'person',          entity: 'Productive::Person'       },
+      { type: 'owner',           entity: 'Productive::Person'       }
+    ]
 
-    def self.included(base) # TODO: use new style of included
-      base.extend Klass
-      # base.include Instance
+    REQ_PARAMS = [
+      { entity: 'Productive::Project',      path: 'projects'      },
+      { entity: 'Productive::Company',      path: 'companies'     },
+      { entity: 'Productive::Organization', path: 'organizations' },
+      { entity: 'Productive::Membership',   path: 'memberships'   },
+      { entity: 'Productive::People',       path: 'people'        },
+      { entity: 'Productive::Workflow',     path: 'workflows'     }
+    ]
+                                          
+    # module inclusion
+    def self.included(base) 
+      base.extend ClassMethods
+      # base.include InstanceMethods
     end
 
-    module Klass
-      # self.extended instead
-      def path
-        config = PRODUCTIVE_CONF['req_params']
-        entity_config = config.find { |param| param['entity'] == name }
-        raise "Entity config not found: #{name}" if entity_config.nil?
-
-        @path ||= entity_config['path']
-      end
-
-      # usage: Project.all
+    # module definition
+    module ClassMethods
       def all
         response = HttpClient.get(path)
         Parser.handle_response(response, self)
@@ -34,9 +46,16 @@ module Productive
         return nil if entity.empty?
         entity.first
       end
+
+      def path
+        config = Common::REQ_PARAMS.find { |param| param[:entity] == self.name }
+        raise "Entity config not found: #{self.name}" if config.nil?
+
+        @path ||= config[:path]
+      end
     end
 
-    # module Instance
+    # module InstanceMethods
     #   # instance methods for entities
     #   def update; end
 

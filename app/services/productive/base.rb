@@ -5,12 +5,12 @@ module Productive
     include Common
     include Parser
 
-    def initialize(attributes, association_types)
+    def initialize(attributes, association_info)
       raise 'ApiRequestError: attributes is blank' if attributes.blank?
-      raise 'ApiRequestError: association_types is blank' if association_types.blank?
+      raise 'ApiRequestError: association_info is blank' if association_info.blank?
 
       create_accessors(attributes)
-      # define_associations(attributes, association_types)
+      define_associations(association_info)
     end
 
     private
@@ -27,25 +27,20 @@ module Productive
       end
     end
 
-    # TODO: refactor the method
     # for associative queries
-    def define_associations(attributes, types)
-      types.each do |type|
-        config = PRODUCTIVE_CONF['relationships']
-        type_config = config.find { |relationship| relationship['type'] == type }
-        raise ApiRequestError, 'Undefined type.' if type_config.nil?
+    def define_associations(association_info)
+      association_info.each do |key, value|
+        # key: membership, etc
+        config = Common::RELATIONSHIPS.find { |relationship| relationship[:type] == key }
+        raise ApiRequestError, 'Undefined type.' if config.nil?
 
-        entity = type_config['entity']
-        method_name = entity.downcase
-        ids = attributes["#{method_name}_id".to_sym] # TODO: id || ids
+        # eg. Membership.find(id)
+        klass = "#{config[:entity]}".constantize
+        ids = Array(value)
 
-        # define association methods for company, organization, etc.
-        flatten_ids = Array(ids)
-        self.class_eval do
-          define_method(method_name.to_sym) do
-            klass = "Productive::#{entity}"
-            flatten_ids.each { |id| klass.constantize.find(id) }
-          end
+        # define association methods
+        class_eval do
+          define_method(key.to_sym) { ids.map { |id| klass.find(id) } }
         end
       end
     end

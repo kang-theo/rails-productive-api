@@ -12,7 +12,7 @@ module Productive
         Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
         response = HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
 
-        Rails.cache.write(cache_key, response, expires_in: 1.hour) # TODO: think of refresh after post
+        Rails.cache.write(cache_key, response, expires_in: 1.hour)
 
         return response
       else
@@ -21,18 +21,30 @@ module Productive
       end
     end
 
-    def post(req_params, data)
+    def self.post(req_params, data)
       @options[:body] = data.to_json
       HTTParty.post(uri, @options)
+
+      # delete cache after post
+      refresh_cache(req_params)
     end
 
-    def put(req_params, data)
-      @options[:body] = data.to_json
-      HTTParty.put(uri, @options)
-    end
+    # def self.put(req_params, data)
+    #   @options[:body] = data.to_json
+    #   HTTParty.put(uri, @options)
+    # end
 
-    def delete(req_params)
-      HTTParty.delete(uri, @options)
+    # def self.delete(req_params)
+    #   HTTParty.delete(uri, @options)
+    # end
+
+    private
+
+    def self.refresh_cache(req_params)
+      cache_key = "httparty_cache/#{req_params}"
+
+      Rails.cache.delete(cache_key)
+      Rails.logger.info("Cache refreshed after POST request for #{cache_key}")
     end
   end
 end
