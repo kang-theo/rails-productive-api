@@ -13,40 +13,32 @@ module Productive
         render json: { error: 'JSON::ParserError' }, status: :bad_response
       end
 
-      instance_results = []
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
-      flatten_data.each do |data_hash|
-        # parse entity attributes and association_types
+      entities = flatten_data.map do |data_hash|
+        # parse entity attributes
         attributes = data_hash['attributes'].merge(id: data_hash['id'])
-        association_types = []
 
-        data_hash['relationships'].each do |key, value|
-          association_types.push(key)
-
+        relationships_hash = data_hash['relationships']
+        relationships_hash.each do |key, value|
           data = value["data"]
           next if data.blank?
 
           if data.is_a?(Array)
-            ids = data.map do |data| 
-              data["id"] 
-            end
-
-            attributes["#{key.singularize}_ids"] = ids
+            attributes["#{key.singularize}_ids"] = data.map { |data| data["id"] }
           else
             attributes["#{key.singularize}_id"] = data["id"]
           end
         end
       
+        # parse association_types
+        association_types = relationships_hash.keys
+
         # create instances
-        entity = klass.new(attributes, association_types)
-        instance_results.push(entity)
+        klass.new(attributes, association_types)
       end
 
-      instance_results
+      entities
     end
-
-    private
-
   end
 end
