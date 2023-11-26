@@ -25,7 +25,7 @@ module Productive
     ]
                                           
     # module inclusion
-    def self.included(base) 
+    def Common.included(base) 
       base.extend ClassMethods
       # base.include InstanceMethods
     end

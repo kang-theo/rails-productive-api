@@ -2,6 +2,5 @@
 
 module Productive
   class Organization < Base
-    include Parser
   end
 end

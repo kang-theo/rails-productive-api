@@ -2,6 +2,5 @@
 
 module Productive
   class Company < Base
-    include Parser
   end
 end

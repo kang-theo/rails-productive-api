@@ -2,6 +2,5 @@
 
 module Productive
   class Person < Base
-    include Parser
   end
 end
