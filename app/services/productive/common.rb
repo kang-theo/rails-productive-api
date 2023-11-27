@@ -23,14 +23,23 @@ module Productive
       { entity: 'Productive::People',       path: 'people'        },
       { entity: 'Productive::Workflow',     path: 'workflows'     }
     ]
+
+    RELATIONSHIP_PAYLOADS = [
+      {association_id: 'company_id', relationship: 'llcompany'},
+      {association_id: 'organization_id', relationship: 'organization'},
+      {association_id: 'project_manager_id', relationship: 'project_manager'},
+      {association_id: 'workflow_id', relationship: 'workflow'},
+      {association_id: 'membership_id', relationship: 'memberships'}
+    ]
                                           
     # module inclusion
     def Common.included(base) 
       base.extend ClassMethods
-      # base.include InstanceMethods
+      base.include InstanceMethods
     end
 
     # module definition
+    # class methods for entities
     module ClassMethods
       def all
         retrieve_entities_from_api("#{path}")
@@ -57,13 +66,27 @@ module Productive
       end
     end
 
-    # module InstanceMethods
-    #   # instance methods for entities
-    #   def update; end
+    # instance methods for entities
+    module InstanceMethods
+      # def update(param_attrs, param_relationships)
+      #   config = 
+      #   attrs = '"attributes": {' + param_attrs.map { |k, v| %Q("#{k}":#{v.inspect}) }.join(',') + '}'
+      #   relationships = '"relationships": {' + param_relationships.map { |k, v| %Q("#{RELATIONSHIP_PAYLOADS.find {|param| param[:association_id] == k}[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": #{v.inspect} } }) }.join(',') + '}'
+
+      #   payload = '{ "data": { "type": ' + "#{self.name.inspect}" + ', ' + attrs + ', ' + relationships + ' } }'
+      #   puts payload
+
+      #   # construct_attributes
+      #   # construct_relationships
+      #   # response = HttpClient.put("#{path}", payload)
+      #   # Parser.handle_response(response, self)
+      # end
+
+      # update({name: "project_test", project_num: "1", project_id: 2}, {company_id: "2134", workflow_id: "650"})
+
 
     #   def archive; end
-
     #   def restore; end
-    # end
+    end
   end
 end

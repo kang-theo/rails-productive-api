@@ -31,9 +31,13 @@ module Productive
       end
     end
 
-    # dash_hash: {"id"=>"xxx", 
-    #             "attributes"=>{"name"=>"xxx", 
-    #             "relationships"=>{"organization"=>{"data"=>{"type"=>"organizations", "id"=>"xxx"}}}}}
+    # Parses associations from a hash.
+    #
+    # Input:
+    #   {"id"=>"xxx", "attributes"=>{"name"=>"xxx", "relationships"=>{"organization"=>{"data"=>{"type"=>"organizations", "id"=>"xxx"}}}}}
+    #
+    # @param [Hash] data_hash: The hash containing association information.
+    # @return [Hash] Parsed association information.
     def self.parse_associations_info(data_hash)
       association_info = {}
 
@@ -49,7 +53,15 @@ module Productive
       association_info
     end
 
-    # association_info: {"organization"=>["xxx"], "company"=>["xxx"], "workflow"=>["xxx"], "memberships"=>["xxx", "xxx"]}
+    # Parses attributes from a hash, considering association information.
+    #
+    # Example Input:
+    #   data_hash: {"id"=>"xxx", "attributes"=>{"name"=>"xxx", "relationships"=>{"organization"=>{"data"=>{"type"=>"organizations", "id"=>"xxx"}}}}}
+    #   association_info: {"organization"=>["xxx"], "company"=>["xxx"], "workflow"=>["xxx"], "memberships"=>["xxx", "xxx"]}
+    #
+    # @param [Hash] data_hash: The hash containing attribute and relationship information.
+    # @param [Hash] association_info: The hash containing association information.
+    # @return [Hash] Parsed attributes.
     def self.parse_attributes(data_hash, association_info)
       attributes = data_hash['attributes'].merge(id: data_hash['id'])
 
