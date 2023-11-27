@@ -33,18 +33,15 @@ module Productive
     # module definition
     module ClassMethods
       def all
-        response = HttpClient.get(path)
-        Parser.handle_response(response, self)
+        retrieve_entities_from_api("#{path}")
       end
 
       def find(id)
         raise ApiRequestError, 'Entity id is invalid.' if id.nil?
+        entities = retrieve_entities_from_api("#{path}/#{id}")
 
-        response = HttpClient.get("#{path}/#{id}")
-        entity = Parser.handle_response(response, self)
-
-        return nil if entity.empty?
-        entity.first
+        return nil if entities.empty?
+        entities.first
       end
 
       def path
@@ -52,6 +49,11 @@ module Productive
         raise "Entity config not found: #{self.name}" if config.nil?
 
         @path ||= config[:path]
+      end
+
+      def retrieve_entities_from_api(req_params)
+        response = HttpClient.get(req_params)
+        Parser.handle_response(response, self)
       end
     end
 
