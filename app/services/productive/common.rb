@@ -2,7 +2,7 @@
 
 module Productive
   module Common
-    # const definition
+    # const definition -----------------------------------------------------------
     RELATIONSHIPS = [
       { type: 'project',         entity: 'Productive::Project'      },
       { type: 'company',         entity: 'Productive::Company'      },
@@ -32,15 +32,42 @@ module Productive
       {association_id: 'membership_id',      relationship: 'memberships'    }
     ]
                                           
-    # module inclusion
+    # module inclusion -----------------------------------------------------------
     def Common.included(base) 
       base.extend ClassMethods
       base.include InstanceMethods
     end
 
-    # module definition
+    # module definition ----------------------------------------------------------
+    # shared methods
+    module SharedMethods
+      def build_payload(attrs, relationships)
+        attributes_string = build_attributes(attrs)
+        relationships_string = build_relationships(relationships)
+
+        %Q|{ "data": { "type": "#{entity_path}", #{attributes_string}, #{relationships_string} } }|
+      end
+
+      def build_attributes(attrs)
+        attributes_body = attrs.map { |k, v| %Q("#{k}": #{v.inspect}) }.join(',')
+        %Q|"attributes": {#{attributes_body}}|
+      end
+
+      def build_relationships(relationships)
+        relationships_body = relationships.map { |k, v| relationship_payload(k, v) }.join(',')
+        %Q|"relationships": {#{relationships_body}}|
+      end
+
+      def relationship_payload(association_id, value)
+        association_info = RELATIONSHIP_PAYLOADS.find { |param| param[:association_id] == association_id.to_s }
+        %Q|"#{association_info[:relationship]}": { "data": { "type": "#{association_id.to_s.sub(/_id\z/, '').pluralize}", "id": #{value.inspect} } }|
+      end
+    end
+
     # class methods for entities
     module ClassMethods
+      include SharedMethods
+
       # Fetches all entities from the API for the current class.
       #
       # @return [Array] An array containing all entities retrieved from the API.
@@ -64,26 +91,6 @@ module Productive
         entities.first
       end
 
-      private
-
-      def path
-        # test removing Common
-        config = REQ_PARAMS.find { |param| param[:entity] == self.name }
-        raise "Entity config not found: #{self.name}" if config.nil?
-
-        @path ||= config[:path]
-      end
-
-      def retrieve_entities_from_api(req_params)
-        response = HttpClient.get(req_params)
-        Parser.handle_response(response, self)
-      end
-    end
-
-    # instance methods for entities
-    module InstanceMethods
-      include HttpClient
-
       # Creates a new entity by sending a POST request to the API.
       #
       # @param attrs [Hash] The attributes for the new entity.
@@ -94,12 +101,35 @@ module Productive
       #   attrs = { name: 'New Entity', value: 42 }
       #   relationships = { category_id: 1 }
       #   MyClass.new.create(attrs, relationships)
+      #   p = Productive::Project.create({name: "create 1", project_manager_id: "561888", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
       def create(attrs, relationships = {})
         response = HttpClient.post("#{path}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
       end
-      # p = Productive::Project.find(399787)
-      # p.create({name: "create 1", project_manager_id: "561888", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
+
+      private
+
+      def path
+        config = REQ_PARAMS.find { |param| param[:entity] == self.name }
+        raise "Entity config not found: #{self.name}" if config.nil?
+
+        @path ||= config[:path]
+      end
+
+      def retrieve_entities_from_api(req_params)
+        response = HttpClient.get(req_params)
+        Parser.handle_response(response, self)
+      end
+
+      def entity_path
+        REQ_PARAMS.find { |param| param[:entity] == self.name }[:path]
+      end
+    end
+
+    # instance methods for entities
+    module InstanceMethods
+      include HttpClient
+      include SharedMethods
 
       # Updates the entity by sending a PATCH request to the API.
       #
@@ -111,44 +141,15 @@ module Productive
       #   attrs = { name: 'Updated Entity', value: 55 }
       #   relationships = { category_id: 2 }
       #   entity = MyClass.new(id: 123)
-      #   entity.update(attrs, relationships)
+      #   p = Productive::Project.find(399787)
+      #   p.update({name: "update 1"})
       def update(attrs, relationships = {})
         response = HttpClient.patch("#{path}/#{id}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
       end
-      # p = Productive::Project.find(399787)
-      # p.update({name: "update 1"})
 
       private
 
-      def build_payload(attrs, relationships)
-        attributes_string = build_attributes(attrs)
-        relationships_string = build_relationships(relationships)
-
-        %Q|{ "data": { "type": "#{entity_path}", #{attributes_string}, #{relationships_string} } }|
-      end
-
-      def build_attributes(attrs)
-        attributes_body = attrs.map { |k, v| %Q("#{k}": #{v.inspect}) }.join(',')
-        %Q|"attributes": {#{attributes_body}}|
-      end
-
-      def build_relationships(relationships)
-        relationships_body = relationships.map { |k, v| relationship_payload(k, v) }.join(',')
-        %Q|"relationships": {#{relationships_body}}|
-      end
-
-      def relationship_payload(association_id, value)
-        association_info = RELATIONSHIP_PAYLOADS.find { |param| param[:association_id] == association_id.to_s }
-        %Q|"#{association_info[:relationship]}": { "data": { "type": "#{association_id.to_s.sub(/_id\z/, '').pluralize}", "id": #{value.inspect} } }|
-      end
-
-      def entity_path
-        REQ_PARAMS.find { |param| param[:entity] == self.class.name }[:path]
-      end
-
-
-      # TODO: refactor, self.included
       def path
         config = REQ_PARAMS.find { |param| param[:entity] == self.class.name }
         raise "Entity config not found: #{self.class.name}" if config.nil?
@@ -156,10 +157,9 @@ module Productive
         @path ||= config[:path]
       end
 
-      # def retrieve_entities_from_api(req_params)
-      #   response = HttpClient.get(req_params)
-      #   Parser.handle_response(response, self)
-      # end
+      def entity_path
+        REQ_PARAMS.find { |param| param[:entity] == self.class.name }[:path]
+      end
     end
   end
 end
