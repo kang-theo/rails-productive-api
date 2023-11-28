@@ -21,16 +21,24 @@ module Productive
       end
     end
 
-    def self.post(req_params, data)
-      @options[:body] = data.to_json
-      HTTParty.post(uri, @options)
+    def self.post(req_params, payload)
+      response = HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      debugger
 
       # delete cache after post
       refresh_cache(req_params)
     end
 
-    # def self.put(req_params, data)
-    #   @options[:body] = data.to_json
+    def self.patch(req_params, payload)
+      response = HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      debugger
+
+      # delete cache after patch
+      refresh_cache(req_params)
+    end
+
+    # def self.put(req_params, payload)
+    #   @options[:body] = payload.to_json
     #   HTTParty.put(uri, @options)
     # end
 

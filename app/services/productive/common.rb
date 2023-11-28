@@ -25,7 +25,7 @@ module Productive
     ]
 
     RELATIONSHIP_PAYLOADS = [
-      {association_id: 'company_id', relationship: 'llcompany'},
+      {association_id: 'company_id', relationship: 'company'},
       {association_id: 'organization_id', relationship: 'organization'},
       {association_id: 'project_manager_id', relationship: 'project_manager'},
       {association_id: 'workflow_id', relationship: 'workflow'},
@@ -53,8 +53,11 @@ module Productive
         entities.first
       end
 
+      private
+
       def path
-        config = Common::REQ_PARAMS.find { |param| param[:entity] == self.name }
+        # test removing Common
+        config = REQ_PARAMS.find { |param| param[:entity] == self.name }
         raise "Entity config not found: #{self.name}" if config.nil?
 
         @path ||= config[:path]
@@ -68,25 +71,59 @@ module Productive
 
     # instance methods for entities
     module InstanceMethods
-      # def update(param_attrs, param_relationships)
-      #   config = 
-      #   attrs = '"attributes": {' + param_attrs.map { |k, v| %Q("#{k}":#{v.inspect}) }.join(',') + '}'
-      #   relationships = '"relationships": {' + param_relationships.map { |k, v| %Q("#{RELATIONSHIP_PAYLOADS.find {|param| param[:association_id] == k}[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": #{v.inspect} } }) }.join(',') + '}'
+      include HttpClient
 
-      #   payload = '{ "data": { "type": ' + "#{self.name.inspect}" + ', ' + attrs + ', ' + relationships + ' } }'
-      #   puts payload
+      def create(attrs, relationships = {})
+        response = HttpClient.post("#{path}", build_payload(attrs, relationships))
+        Parser.handle_response(response, self)
+      end
+      # p = Productive::Project.find(399787)
+      # p.create({name: "create 1", project_manager_id: "561888", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
 
-      #   # construct_attributes
-      #   # construct_relationships
-      #   # response = HttpClient.put("#{path}", payload)
-      #   # Parser.handle_response(response, self)
+      def update(attrs, relationships = {})
+        response = HttpClient.patch("#{path}/#{id}", build_payload(attrs, relationships))
+        Parser.handle_response(response, self)
+      end
+      # p = Productive::Project.find(399787)
+      # p.update({name: "update 1"})
+
+      private
+
+      def build_payload(attrs, relationships)
+        # build_attributes
+        attr_header = '"attributes": {'
+        attr_body = attrs.map { |k, v| %Q("#{k}":#{v.inspect}) }.join(',')
+        attr_footer = '}'
+
+        attrs = attr_header + attr_body + attr_footer
+        # attrs = '"attributes": {' + param_attrs.map { |k, v| %Q("#{k}":#{v.inspect}) }.join(',') + '}'
+
+        # build_relationships
+        relationship_header = '"relationships": {'
+        relationship_body = relationships.map do |k, v| 
+          %Q("#{RELATIONSHIP_PAYLOADS.find {|param| param[:association_id] == k.to_s}[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": #{v.inspect} } }) 
+        end.join(',')
+        relationship_footer = '}'
+
+        relationships = relationship_header + relationship_body + relationship_footer
+        # relationships = '"relationships": {' + param_relationships.map { |k, v| %Q("#{RELATIONSHIP_PAYLOADS.find {|param| param[:association_id] == k.to_sym}}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": #{v.inspect} } }) }.join(',') + '}'
+
+        # build payload
+        '{ "data": { "type": ' + %Q("#{REQ_PARAMS.find { |param| param[:entity] == self.class.name }[:path]}") + ',' + attrs + ',' + relationships + '} }'
+      end
+
+      # TODO: refactor, self.included
+      def path
+        config = REQ_PARAMS.find { |param| param[:entity] == self.class.name }
+        raise "Entity config not found: #{self.class.name}" if config.nil?
+
+        @path ||= config[:path]
+      end
+
+      # def retrieve_entities_from_api(req_params)
+      #   response = HttpClient.get(req_params)
+      #   Parser.handle_response(response, self)
       # end
-
-      # update({name: "project_test", project_num: "1", project_id: 2}, {company_id: "2134", workflow_id: "650"})
-
-
-    #   def archive; end
-    #   def restore; end
     end
   end
 end

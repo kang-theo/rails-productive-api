@@ -1,6 +1,6 @@
 development:
   endpoint: 'https://api.productive.io/api/v2'
-  auth_info: {"X-Auth-Token": <%= Rails.application.credentials.productive_api_token %>, "X-Organization-Id": "<%= Rails.application.credentials.organization_id %>", "Content-Type": 'application/vnd.api+json'}
+  auth_info: {"X-Auth-Token": <%= Rails.application.credentials.productive_api_token %>, "X-Organization-Id": "<%= Rails.application.credentials.organization_id %>", "Accept": '/text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5', "Content-Type": 'application/vnd.api+json'}
 
   # relationships:
   #   - type: 'project'
