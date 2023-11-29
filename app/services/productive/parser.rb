@@ -9,6 +9,7 @@ module Productive
       parsed_data = parse_response { JSON.parse(response.body).dig('data') }
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
+      # TODO: 参数传递问题
       entities = flatten_data.map do |data_hash|
         association_info = parse_associations_info(data_hash)
         attributes = parse_attributes(data_hash, association_info)

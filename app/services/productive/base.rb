@@ -31,6 +31,7 @@ module Productive
     def define_associations(association_info)
       association_info.each do |key, value|
         # key: membership, etc
+        # TODO: 是不是真的需要这个配置文件？
         config = Common::RELATIONSHIPS.find { |relationship| relationship[:type] == key }
         raise ApiRequestError, 'Undefined type.' if config.nil?
 

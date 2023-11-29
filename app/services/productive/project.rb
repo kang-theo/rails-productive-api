@@ -10,6 +10,7 @@ module Productive
       #   p = Productive::Project.find(399787)
       #   p.archive
       def archive
+        # TODO: 代码重复，最后想要的效果是，直接调用 archive 就行了，这些代码看是否提取到父类中
         response = HttpClient.patch("#{path}/#{id}/archive")
         Parser.handle_response(response, self)
       end

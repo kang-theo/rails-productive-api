@@ -3,35 +3,19 @@
 module Productive
   module Common
     # const definition -----------------------------------------------------------
-    RELATIONSHIPS = [
-      { type: 'project',         entity: 'Productive::Project'      },
-      { type: 'company',         entity: 'Productive::Company'      },
-      { type: 'organization',    entity: 'Productive::Organization' },
-      { type: 'memberships',     entity: 'Productive::Membership'   },
-      { type: 'workflow',        entity: 'Productive::Workflow'     },
-      { type: 'project_manager', entity: 'Productive::Person'       },
-      { type: 'last_actor',      entity: 'Productive::Person'       },
-      { type: 'person',          entity: 'Productive::Person'       },
-      { type: 'owner',           entity: 'Productive::Person'       }
+    # TODO： 从 response 中应该可以获取所有需要的信息，不需要把这些信息再存到表里
+    ENTITY_CONFIG = [
+      { entity: 'Productive::Project',      req_path: 'projects',      relationship_type: 'project',        association_id: 'project_id',        },
+      { entity: 'Productive::Company',      req_path: 'companies',     relationship_type: 'company',        association_id: 'company_id',   },
+      { entity: 'Productive::Organization', req_path: 'organizations', relationship_type: 'organization',   association_id: 'organization_id',},
+      { entity: 'Productive::Membership',   req_path: 'memberships',   relationship_type: 'memberships',    association_id: 'membership_id',       },
+      { entity: 'Productive::Workflow',     req_path: 'workflows',     relationship_type: 'workflow',       association_id: 'workflow_id',     },
+      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'person',         association_id: 'person_id',    },
+      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'project_manager',association_id: 'project_manager_id',   },
+      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'last_actor',     association_id: 'last_actor_id'    },
+      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'owner',          association_id: 'owner_id',  }
     ]
 
-    REQ_PARAMS = [
-      { entity: 'Productive::Project',      path: 'projects'      },
-      { entity: 'Productive::Company',      path: 'companies'     },
-      { entity: 'Productive::Organization', path: 'organizations' },
-      { entity: 'Productive::Membership',   path: 'memberships'   },
-      { entity: 'Productive::People',       path: 'people'        },
-      { entity: 'Productive::Workflow',     path: 'workflows'     }
-    ]
-
-    RELATIONSHIP_PAYLOAD = [
-      {association_id: 'company_id',         relationship: 'company'        },
-      {association_id: 'organization_id',    relationship: 'organization'   },
-      {association_id: 'project_manager_id', relationship: 'project_manager'},
-      {association_id: 'workflow_id',        relationship: 'workflow'       },
-      {association_id: 'membership_id',      relationship: 'memberships'    }
-    ]
-                                          
     # module inclusion -----------------------------------------------------------
     def Common.included(base) 
       base.extend ClassMethods
@@ -50,6 +34,7 @@ module Productive
         path ||= config[:path]
       end
 
+      # TODO: 不要总是传递参数，最好的就是没有参数，使用更加面向对象的方式
       def build_payload(attrs, relationships = {})
         # attrs are essential
         raise ApiRequestError, 'Attributes are blank.' if attrs.blank?
@@ -75,6 +60,7 @@ module Productive
           association_info = RELATIONSHIP_PAYLOAD.find { |param| param[:association_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
 
+          # TODO: membership 是一个数组，需要考虑到这种情况
           { "#{association_info[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
         end
 
@@ -118,6 +104,7 @@ module Productive
       #
       # Example:
       #   p = Productive::Project.create({name: "create 1", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
+      # TODO: 当写测试时，需要考虑所有的参数，这就是尽量减少传递参数的原因
       def create(attrs, relationships = {})
         response = HttpClient.post("#{path}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
@@ -146,6 +133,7 @@ module Productive
       #   p = Productive::Project.find(399787)
       #   p.update({name: "update 1"})
       def update(attrs, relationships = {})
+        # TODO: 使用更加有意义的方法，比如：update, patch_attributes, etc.
         response = HttpClient.patch("#{path}/#{id}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
       end
