@@ -3,7 +3,7 @@ module Productive
     @@endpoint = PRODUCTIVE_CONF['endpoint']
     @@headers = PRODUCTIVE_CONF['auth_info']
 
-    def self.get(req_params)
+    def self.get(req_params = {})
       cache_key = "httparty_cache/#{req_params}"
 
       cached_result = Rails.cache.read(cache_key)
@@ -21,30 +21,24 @@ module Productive
       end
     end
 
-    def self.post(req_params, payload)
-      response = HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
-      debugger
-
+    def self.post(req_params = {}, payload = {})
       # delete cache after post
       refresh_cache(req_params)
+
+      HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
     end
 
-    def self.patch(req_params, payload)
-      response = HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
-      debugger
-
-      # delete cache after patch
+    def self.patch(req_params = {}, payload = {})
       refresh_cache(req_params)
+
+      HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
     end
 
-    # def self.put(req_params, payload)
-    #   @options[:body] = payload.to_json
-    #   HTTParty.put(uri, @options)
-    # end
+    def self.delete(req_params)
+      refresh_cache(req_params)
 
-    # def self.delete(req_params)
-    #   HTTParty.delete(uri, @options)
-    # end
+      HTTParty.delete("#{@@endpoint}/#{req_params}", headers: @@headers)
+    end
 
     private
 
