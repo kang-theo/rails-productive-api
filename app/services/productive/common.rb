@@ -24,7 +24,7 @@ module Productive
       { entity: 'Productive::Workflow',     path: 'workflows'     }
     ]
 
-    RELATIONSHIP_PAYLOADS = [
+    RELATIONSHIP_PAYLOAD = [
       {association_id: 'company_id',         relationship: 'company'        },
       {association_id: 'organization_id',    relationship: 'organization'   },
       {association_id: 'project_manager_id', relationship: 'project_manager'},
@@ -41,12 +41,25 @@ module Productive
     # module definition ----------------------------------------------------------
     # shared methods
     module SharedMethods
+      def path
+        entity_name = respond_to?(:name) ? name : self.class.name
+
+        config = REQ_PARAMS.find { |param| param[:entity] == entity_name }
+        raise ApiRequestError, "Entity config not found: #{entity_name}" if config.nil?
+
+        path ||= config[:path]
+      end
+
       def build_payload(attrs, relationships = {})
         # attrs are essential
         raise ApiRequestError, 'Attributes are blank.' if attrs.blank?
 
-        payload = { "data": { "type": entity_path } }
-        payload[:data][:attributes] = attrs
+        payload = {
+          "data": {
+            "type": path,
+            "attributes": attrs
+          }
+        }
 
         # relationships are optional
         return payload.to_json if relationships.blank?
@@ -59,7 +72,7 @@ module Productive
 
       def build_relationships(relationships)
         relationships_array = relationships.map do |k, v| 
-          association_info = RELATIONSHIP_PAYLOADS.find { |param| param[:association_id] == k.to_s }
+          association_info = RELATIONSHIP_PAYLOAD.find { |param| param[:association_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
 
           { "#{association_info[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
@@ -112,20 +125,9 @@ module Productive
 
       private
 
-      def path
-        config = REQ_PARAMS.find { |param| param[:entity] == self.name }
-        raise "Entity config not found: #{self.name}" if config.nil?
-
-        @path ||= config[:path]
-      end
-
       def retrieve_entities_from_api(req_params)
         response = HttpClient.get(req_params)
         Parser.handle_response(response, self)
-      end
-
-      def entity_path
-        REQ_PARAMS.find { |param| param[:entity] == self.name }[:path]
       end
     end
 
@@ -146,19 +148,6 @@ module Productive
       def update(attrs, relationships = {})
         response = HttpClient.patch("#{path}/#{id}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
-      end
-
-      private
-
-      def path
-        config = REQ_PARAMS.find { |param| param[:entity] == self.class.name }
-        raise "Entity config not found: #{self.class.name}" if config.nil?
-
-        @path ||= config[:path]
-      end
-
-      def entity_path
-        REQ_PARAMS.find { |param| param[:entity] == self.class.name }[:path]
       end
     end
   end
