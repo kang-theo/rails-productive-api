@@ -41,26 +41,32 @@ module Productive
     # module definition ----------------------------------------------------------
     # shared methods
     module SharedMethods
-      def build_payload(attrs, relationships)
-        attributes_string = build_attributes(attrs)
-        relationships_string = build_relationships(relationships)
+      def build_payload(attrs, relationships = {})
+        # attrs are essential
+        raise ApiRequestError, 'Attributes are blank.' if attrs.blank?
 
-        %Q|{ "data": { "type": "#{entity_path}", #{attributes_string}, #{relationships_string} } }|
-      end
+        payload = { "data": { "type": entity_path } }
+        payload[:data][:attributes] = attrs
 
-      def build_attributes(attrs)
-        attributes_body = attrs.map { |k, v| %Q("#{k}": #{v.inspect}) }.join(',')
-        %Q|"attributes": {#{attributes_body}}|
+        # relationships are optional
+        return payload.to_json if relationships.blank?
+
+        relationships_hash = build_relationships(relationships)
+        payload[:data][:relationships] = relationships_hash
+
+        payload.to_json
       end
 
       def build_relationships(relationships)
-        relationships_body = relationships.map { |k, v| relationship_payload(k, v) }.join(',')
-        %Q|"relationships": {#{relationships_body}}|
-      end
+        relationships_array = relationships.map do |k, v| 
+          association_info = RELATIONSHIP_PAYLOADS.find { |param| param[:association_id] == k.to_s }
+          raise ApiRequestError if association_info.nil?
 
-      def relationship_payload(association_id, value)
-        association_info = RELATIONSHIP_PAYLOADS.find { |param| param[:association_id] == association_id.to_s }
-        %Q|"#{association_info[:relationship]}": { "data": { "type": "#{association_id.to_s.sub(/_id\z/, '').pluralize}", "id": #{value.inspect} } }|
+          { "#{association_info[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
+        end
+
+        # merge all the relationships together and convert it to Hash
+        relationships_array.reduce({}, :merge)
       end
     end
 
@@ -72,7 +78,7 @@ module Productive
       #
       # @return [Array] An array containing all entities retrieved from the API.
       #
-      # Example: MyClass.all
+      # Example: Productive::Project.all
       def all
         retrieve_entities_from_api("#{path}")
       end
@@ -82,7 +88,7 @@ module Productive
       # @param id [String, Integer] The ID of the entity to be retrieved from the API.
       # @return [Object, nil] The entity with the specified ID, or nil if not found.
       #
-      # Example: MyClass.find(123)
+      # Example: Productive::Project.find(123)
       def find(id)
         raise ApiRequestError, 'Entity id is invalid.' if id.nil?
         entities = retrieve_entities_from_api("#{path}/#{id}")
@@ -98,10 +104,7 @@ module Productive
       # @return [Object] The newly created entity.
       #
       # Example:
-      #   attrs = { name: 'New Entity', value: 42 }
-      #   relationships = { category_id: 1 }
-      #   MyClass.new.create(attrs, relationships)
-      #   p = Productive::Project.create({name: "create 1", project_manager_id: "561888", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
+      #   p = Productive::Project.create({name: "create 1", project_type_id: 1}, {company_id: "699400", project_manager_id: "561888", workflow_id: "32544"})
       def create(attrs, relationships = {})
         response = HttpClient.post("#{path}", build_payload(attrs, relationships))
         Parser.handle_response(response, self)
@@ -138,9 +141,6 @@ module Productive
       # @return [Object] The updated entity.
       #
       # Example:
-      #   attrs = { name: 'Updated Entity', value: 55 }
-      #   relationships = { category_id: 2 }
-      #   entity = MyClass.new(id: 123)
       #   p = Productive::Project.find(399787)
       #   p.update({name: "update 1"})
       def update(attrs, relationships = {})
