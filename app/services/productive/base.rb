@@ -32,8 +32,9 @@ module Productive
       association_info.each do |key, value|
         # key: membership, etc
         # TODO: 是不是真的需要这个配置文件？
-        config = Common::RELATIONSHIPS.find { |relationship| relationship[:type] == key }
-        raise ApiRequestError, 'Undefined type.' if config.nil?
+        # config = Common::RELATIONSHIPS.find { |relationship| relationship[:type] == key }
+        config = Common::ENTITY_RELATIONSHIP.find { |relationship| relationship[:relationship_key] == key }
+        raise ApiRequestError, 'Undefined relationship.' if config.nil?
 
         # eg. Membership.find(id)
         klass = "#{config[:entity]}".constantize

@@ -4,16 +4,17 @@ module Productive
   module Common
     # const definition -----------------------------------------------------------
     # TODO： 从 response 中应该可以获取所有需要的信息，不需要把这些信息再存到表里
-    ENTITY_CONFIG = [
-      { entity: 'Productive::Project',      req_path: 'projects',      relationship_type: 'project',        association_id: 'project_id',        },
-      { entity: 'Productive::Company',      req_path: 'companies',     relationship_type: 'company',        association_id: 'company_id',   },
-      { entity: 'Productive::Organization', req_path: 'organizations', relationship_type: 'organization',   association_id: 'organization_id',},
-      { entity: 'Productive::Membership',   req_path: 'memberships',   relationship_type: 'memberships',    association_id: 'membership_id',       },
-      { entity: 'Productive::Workflow',     req_path: 'workflows',     relationship_type: 'workflow',       association_id: 'workflow_id',     },
-      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'person',         association_id: 'person_id',    },
-      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'project_manager',association_id: 'project_manager_id',   },
-      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'last_actor',     association_id: 'last_actor_id'    },
-      { entity: 'Productive::People',       req_path: 'people',        relationship_type: 'owner',          association_id: 'owner_id',  }
+    # req_path: the same with relationship_type, relationship_key: the association_inf[key], relationship_type: the type in the relationship, relationship_id: the association_id, the id in the relationship
+    ENTITY_RELATIONSHIP = [
+      { entity: 'Productive::Project',      req_path: 'projects',      relationship_key: 'project',         relationship_type: 'projects',      relationship_id: 'project_id',        },
+      { entity: 'Productive::Company',      req_path: 'companies',     relationship_key: 'company',         relationship_type: 'companies',     relationship_id: 'company_id',        },
+      { entity: 'Productive::Organization', req_path: 'organizations', relationship_key: 'organization',    relationship_type: 'organizations', relationship_id: 'organization_id',   },
+      { entity: 'Productive::Membership',   req_path: 'memberships',   relationship_key: 'memberships',     relationship_type: 'memberships',   relationship_id: 'membership_id',     },
+      { entity: 'Productive::Workflow',     req_path: 'workflows',     relationship_key: 'workflow',        relationship_type: 'workflows',     relationship_id: 'workflow_id',       },
+      { entity: 'Productive::Person',       req_path: 'people',        relationship_key: 'person',          relationship_type: 'people',        relationship_id: 'person_id',         },
+      { entity: 'Productive::Person',       req_path: 'people',        relationship_key: 'project_manager', relationship_type: 'people',        relationship_id: 'project_manager_id',},
+      { entity: 'Productive::Person',       req_path: 'people',        relationship_key: 'last_actor',      relationship_type: 'people',        relationship_id: 'last_actor_id'      },
+      { entity: 'Productive::Person',       req_path: 'people',        relationship_key: 'owner',           relationship_type: 'people',        relationship_id: 'owner_id',          }
     ]
 
     # module inclusion -----------------------------------------------------------
@@ -28,10 +29,10 @@ module Productive
       def path
         entity_name = respond_to?(:name) ? name : self.class.name
 
-        config = REQ_PARAMS.find { |param| param[:entity] == entity_name }
+        config = ENTITY_RELATIONSHIP.find { |param| param[:entity] == entity_name }
         raise ApiRequestError, "Entity config not found: #{entity_name}" if config.nil?
 
-        path ||= config[:path]
+        path ||= config[:req_path]
       end
 
       # TODO: 不要总是传递参数，最好的就是没有参数，使用更加面向对象的方式
@@ -57,11 +58,11 @@ module Productive
 
       def build_relationships(relationships)
         relationships_array = relationships.map do |k, v| 
-          association_info = RELATIONSHIP_PAYLOAD.find { |param| param[:association_id] == k.to_s }
+          association_info = ENTITY_RELATIONSHIP.find { |param| param[:relationship_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
 
           # TODO: membership 是一个数组，需要考虑到这种情况
-          { "#{association_info[:relationship]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
+          { "#{association_info[:relationship_key]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
         end
 
         # merge all the relationships together and convert it to Hash
