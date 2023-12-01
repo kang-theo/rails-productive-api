@@ -5,12 +5,39 @@ module Productive
     include Common
     include Parser
 
-    def initialize(attributes, association_info)
-      raise 'ApiRequestError: attributes is blank' if attributes.blank?
-      raise 'ApiRequestError: association_info is blank' if association_info.blank?
+    def changes
+      @changes ||= {}
+    end
+    
+    def changed_attrs
+      @changed_attrs ||= {}
+    end
 
+    def changed_relationships
+      @changed_relationships ||= {}
+    end
+
+    # TODO: set required attributes when creating an instance
+    def initialize(attributes = {}, association_info = {})
+      raise 'ApiRequestError: attributes is blank' if attributes.blank?
+
+      attributes.merge!({ name: "", project_type_id: nil, project_manager_id: "", company_id: "", workflow_id: "" })
       create_accessors(attributes)
-      define_associations(association_info)
+      define_associations(association_info) if association_info.present?
+    end
+
+    def inspect
+      attributes_to_exclude = [:changed_attrs, :changed_relationships, :changes]
+      filtered_instance_variables = instance_variables.reject do |var|
+        attributes_to_exclude.include?(var.to_sym)
+        debugger
+      end
+
+      filtered_attributes = filtered_instance_variables.each_with_object({}) do |var, hash|
+        hash[var.to_s.delete("@")] = instance_variable_get(var)
+      end
+
+      "#<#{self.class}:#{object_id} #{filtered_attributes}>"
     end
 
     private
@@ -22,7 +49,10 @@ module Productive
 
         class_eval do
           define_method(key) { instance_variable_get("@#{key}") }
-          define_method("#{key}=") { |value| instance_variable_set("@#{key}", value) }
+          define_method("#{key}=") do |value| 
+            track_change("#{key}".to_sym, send("#{key}"), value)
+            instance_variable_set("@#{key}", value)
+          end
         end
       end
     end
@@ -31,8 +61,6 @@ module Productive
     def define_associations(association_info)
       association_info.each do |key, value|
         # key: membership, etc
-        # TODO: 是不是真的需要这个配置文件？
-        # config = Common::RELATIONSHIPS.find { |relationship| relationship[:type] == key }
         config = Common::ENTITY_RELATIONSHIP.find { |relationship| relationship[:relationship_key] == key }
         raise ApiRequestError, 'Undefined relationship.' if config.nil?
 

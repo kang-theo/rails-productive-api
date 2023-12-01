@@ -27,14 +27,15 @@ module Productive
         Parser.handle_response(response, self)
       end
 
-    # Delete the entity by sending a DELETE request to the API.
+      # use more meaningful method name, etc. delete = destroy
+      # Delete the entity by sending a DELETE request to the API.
       #
       # @return [Object] The deleted entity.
       #
       # Example:
       #   p = Productive::Project.find(399787)
-      #   p.delete
-      def delete
+      #   p.destroy
+      def destroy
         response = HttpClient.delete("#{path}/#{id}")
         Parser.handle_response(response, self)
       end

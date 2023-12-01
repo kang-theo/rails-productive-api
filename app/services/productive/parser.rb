@@ -9,7 +9,6 @@ module Productive
       parsed_data = parse_response { JSON.parse(response.body).dig('data') }
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
-      # TODO: 参数传递问题
       entities = flatten_data.map do |data_hash|
         association_info = parse_associations_info(data_hash)
         attributes = parse_attributes(data_hash, association_info)
@@ -47,8 +46,9 @@ module Productive
         data = value["data"]
         next if data.blank?
 
-        flatten_data = data.is_a?(Array) ? data : [data]
-        association_info[key] = flatten_data.map { |flatten_data| flatten_data["id"] }
+        # flatten_data = data.is_a?(Array) ? data : [data]
+        # association_info[key] = flatten_data.map { |flatten_data| flatten_data["id"] }
+        association_info[key] = data.is_a?(Array) ? data.map { |datum| datum["id"] } : data["id"]
       end
 
       association_info
@@ -64,14 +64,11 @@ module Productive
     # @param [Hash] association_info: The hash containing association information.
     # @return [Hash] Parsed attributes.
     def self.parse_attributes(data_hash, association_info)
-      attributes = data_hash['attributes'].merge(id: data_hash['id'])
+      attributes = data_hash['attributes'].merge("id" => data_hash['id'])
 
       association_info.each do |key, value|
-        if value.is_a?(Array) 
-          attributes["#{key.singularize}_ids"] = value
-        else
-          attributes["#{key.singularize}_id"] = value
-        end
+        association_key = "#{key.singularize}_id#{'s' if value.is_a?(Array)}"
+        attributes.merge!(association_key => value)
       end
 
       attributes
