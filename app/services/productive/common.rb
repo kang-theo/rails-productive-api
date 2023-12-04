@@ -3,7 +3,7 @@
 module Productive
   module Common
     # const definition -----------------------------------------------------------
-    # TODO: 从 response 中应该可以获取所有需要的信息，不需要把这些信息再存到表里
+    # TODO: get from the response, avoid redundancy
     # req_path: the same with relationship_type, relationship_key: the association_inf[key], relationship_type: the type in the relationship, relationship_id: the association_id, the id in the relationship
     ENTITY_RELATIONSHIP = [
       { entity: 'Productive::Project',      req_path: 'projects',      relationship_key: 'project',         relationship_type: 'projects',      relationship_id: 'project_id'        },
@@ -79,11 +79,10 @@ module Productive
 
       def build_relationships
         relationships_array = changed_relationships.map do |k, v| 
-          debugger
           association_info = ENTITY_RELATIONSHIP.find { |param| param[:relationship_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
 
-          # TODO: membership 是一个数组，需要考虑到这种情况
+          # TODO: membership is an array
           { "#{association_info[:relationship_key]}": { "data": { "type": "#{k.to_s.sub(/_id\z/, '').pluralize}", "id": v } } }
         end
 

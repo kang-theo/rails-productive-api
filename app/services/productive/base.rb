@@ -27,10 +27,9 @@ module Productive
     end
 
     def inspect
-      attributes_to_exclude = [:changed_attrs, :changed_relationships, :changes]
+      attributes_to_exclude = [:@changed_attrs, :@changed_relationships, :@changes]
       filtered_instance_variables = instance_variables.reject do |var|
         attributes_to_exclude.include?(var.to_sym)
-        debugger
       end
 
       filtered_attributes = filtered_instance_variables.each_with_object({}) do |var, hash|
