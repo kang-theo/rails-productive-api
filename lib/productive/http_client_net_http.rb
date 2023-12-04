@@ -192,8 +192,6 @@ module Productive
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           end
 
-          # puts request
-          # puts payload
           request.body =
             response = http.request(request, payload)
 

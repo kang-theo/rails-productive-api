@@ -19,9 +19,9 @@ module Productive
 
     # TODO: set required attributes when creating an instance
     def initialize(attributes = {}, association_info = {})
-      raise 'ApiRequestError: attributes is blank' if attributes.blank?
+      # raise 'ApiRequestError: attributes is blank' if attributes.blank?
 
-      attributes.merge!({ name: "", project_type_id: nil, project_manager_id: "", company_id: "", workflow_id: "" })
+      attributes.merge!({ name: "", project_type_id: nil, project_manager_id: "", company_id: "", workflow_id: "" }) if attributes.empty?
       create_accessors(attributes)
       define_associations(association_info) if association_info.present?
     end

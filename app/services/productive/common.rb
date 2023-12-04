@@ -47,15 +47,12 @@ module Productive
       end
 
       def build_payload
-        puts changes
         changed_attrs
         changed_relationships
 
         changes.each do |k, v|
           foreign_key?(k) ? changed_relationships[k] = v : changed_attrs[k] = v
         end
-
-        puts changed_attrs, changed_relationships
 
         # attrs are essential
         raise ApiRequestError, 'Attributes are blank.' if changed_attrs.blank?
@@ -73,7 +70,6 @@ module Productive
         relationships_hash = build_relationships
         payload[:data][:relationships] = relationships_hash
 
-        puts payload.to_json
         payload.to_json
       end
 
@@ -109,7 +105,7 @@ module Productive
       # @param id [String, Integer] The ID of the entity to be retrieved from the API.
       # @return [Object, nil] The entity with the specified ID, or nil if not found.
       #
-      # Example: Productive::Project.find(123)
+      # Example: Productive::Project.find(399787)
       def find(id)
         raise ApiRequestError, 'Entity id is invalid.' if id.nil?
         entities = retrieve_entities_from_api("#{path}/#{id}")
@@ -138,10 +134,8 @@ module Productive
       def handle_request
         case new? ? :create : :update
         when :create
-          puts "create"
           HttpClient.post("#{path}", build_payload)
         when :update
-          puts "update"
           HttpClient.patch("#{path}/#{id}", build_payload)
         else
           raise ApiRequestError, 'Undefined action.'
