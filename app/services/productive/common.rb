@@ -161,8 +161,10 @@ module Productive
       #   p.workflow_id="31544"
       #   p.save
       def save
-        handle_request
-        self
+        response = handle_request
+
+        return self if response.success?
+        nil
       end
     end
   end

@@ -1,20 +1,12 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-require 'support/simplecov'
-SimpleCov.start do
-  add_filter '/spec/'
-end
 require 'simplecov'
 
-SimpleCov.start do
-  add_filter '/spec/' # Exclude test files
-  add_filter '/vendor/' # Exclude vendor files
-  add_filter '/config/' # Exclude configuration files
-  
-  # Add this line to include only files from a specific folder
-  add_filter '/your_folder_name/'
+SimpleCov.start do |source_file|
+  add_filter '/config/'
+  add_filter '/spec/'
+  add_filter '/helpers/'
 end
-
 
 require File.expand_path('../config/environment', __dir__)
 

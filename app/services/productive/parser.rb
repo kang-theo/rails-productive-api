@@ -3,8 +3,7 @@
 module Productive
   module Parser
     def self.handle_response(response, klass)
-      # exception handling
-      raise ApiRequestError, "API request failed with status #{response.code}: #{response.body}" unless response.success?
+      return [] unless response.success?
       
       parsed_data = parse_response { JSON.parse(response.body).dig('data') }
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
@@ -27,7 +26,7 @@ module Productive
         yield
       rescue JSON::ParserError => e
         Rails.logger.error "JSON::ParserError: #{e.message}"
-        render json: { error: 'JSON::ParserError' }, status: :bad_response
+        { error: 'JSON::ParserError', status: :bad_response }
       end
     end
 
