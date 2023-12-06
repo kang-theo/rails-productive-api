@@ -1,13 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Productive::Parser, type: :request do
-  # describe '.handle_response' do
-  #   it 'parses http response to create entities' do
-  #     # mock need to mock the response of http request
-  #     # response = 
-  #   end
-
-  # end
 # =begin
   describe '.parse_response' do
     context 'when the block execution is successful' do
@@ -106,7 +99,7 @@ RSpec.describe Productive::Parser, type: :request do
   end
 
   describe '.parse_attributes' do
-    context '' do
+    context 'parse attributes from response' do
       it '' do
         data_hash = {"id"=>"399787", "type"=>"projects", "attributes"=>{"name"=>"Update project", "number"=>"1", "project_number"=>"1", "project_type_id"=>1, "project_color_id"=>9, "last_activity_at"=>"2023-12-05T05:40:54.000+01:00", "public_access"=>true, "time_on_tasks"=>false, "tag_colors"=>{}, "archived_at"=>nil, "created_at"=>"2023-11-28T01:04:43.344+01:00", "template"=>false, "needs_invoicing"=>false, "sample_data"=>true}, "relationships"=>{"organization"=>{"data"=>{"type"=>"organizations", "id"=>"31810"}}, "company"=>{"data"=>{"type"=>"companies", "id"=>"699398"}}, "project_manager"=>{"data"=>{"type"=>"people", "id"=>"561888"}}, "last_actor"=>{"data"=>{"type"=>"people", "id"=>"561886"}}, "workflow"=>{"data"=>{"type"=>"workflows", "id"=>"32544"}}, "memberships"=>{"data"=>[{"type"=>"memberships", "id"=>"6368022"}, {"type"=>"memberships", "id"=>"6368023"}, {"type"=>"memberships", "id"=>"6368024"}, {"type"=>"memberships", "id"=>"6450128"}]}}}
         association_info = {"organization"=>"31810", "company"=>"699398", "project_manager"=>"561888", "last_actor"=>"561886", "workflow"=>"32544", "memberships"=>["6368022", "6368023", "6368024", "6450128"]}

@@ -13,6 +13,7 @@ module Productive
         attributes = parse_attributes(data_hash, association_info)
 
         # create instances
+        klass = klass.class != Class ? klass.class : klass
         klass.new(attributes, association_info)
       end
 

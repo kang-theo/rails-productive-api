@@ -12,7 +12,10 @@ module Productive
       def archive
         # TODO: check whether just call archive directly, and abstract these methods to Base class
         response = HttpClient.patch("#{path}/#{id}/archive")
-        Parser.handle_response(response, self)
+        result = Parser.handle_response(response, self)
+
+        return nil if result.empty?
+        result.first
       end
 
     # Restores the entity by sending a PATCH request to the API.
@@ -24,7 +27,10 @@ module Productive
       #   p. restore
       def restore
         response = HttpClient.patch("#{path}/#{id}/restore")
-        Parser.handle_response(response, self)
+        result = Parser.handle_response(response, self)
+
+        return nil if result.empty?
+        result.first
       end
 
       # use more meaningful method name, etc. delete = destroy

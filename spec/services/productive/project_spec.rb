@@ -43,6 +43,7 @@ RSpec.describe Productive::Project, type: :model do
       end
     end
 
+    # TODO: to be tested after mocking response
     # context 'instantiate a project based on info from the API response' do
     #   it 'creates an instance with default attributes' do
     #     entity = Productive::Project.new
@@ -120,10 +121,6 @@ RSpec.describe Productive::Project, type: :model do
         entity.company_id = '699400'
         entity.workflow_id = '32544'
 
-        # mock
-        # allow(Productive::HttpClient).to receive(:post).and_return('success')
-        # expect(Productive::HttpClient).to receive(:post).with('projects', instance_of(String))
-
         # act
         result = entity.save
 
@@ -199,22 +196,65 @@ RSpec.describe Productive::Project, type: :model do
         expect(result).to be_nil
       end
 
-      it 'updates an existing entity without chaning anything' do
+      it 'updates an existing entity without changing anything' do
         # arrange
         entity = Productive::Project.find(399787)
         entity.name = 'Update project'
         entity.company_id = '699400'
-
-        # mock
-        # allow(Productive::HttpClient).to receive(:post).and_return('success')
-        # expect(Productive::HttpClient).to receive(:post).with('projects', instance_of(String))
 
         # assert
         expect{entity.save}.to raise_error(ApiRequestError, 'Attributes are blank.')
       end
     end
   end
-# =end
 
-  # TODO: see if need to test other methods in Common like track_change, path, foreign_key?, build_payload, build_relationships, archive, copy, delete, restore
+  describe '#inspect' do
+    it 'outputs a string representation of an object' do
+      entity = Productive::Project.new
+      entity.name = "New name"
+      entity.company_id = "699401"  
+
+      expect(entity.inspect).not_to include("changed_attrs")
+      expect(entity.inspect).not_to include("changed_relationships")
+    end
+  end
+
+  describe "#archive" do
+    it "archives an existing project" do
+      entity = Productive::Project.find(399787)  
+      result = entity.archive
+      expect(result.archived_at).to_not be_nil 
+    end
+
+    it "archives an non-existing project" do
+      entity = Productive::Project.find(123)  
+      expect(entity).to be_nil 
+    end
+  end
+
+  describe "#restore" do
+    it "restores an existing project" do
+      entity = Productive::Project.find(399787)  
+      result = entity.restore
+      expect(result.archived_at).to be_nil 
+    end
+  end
+
+  # TODO: to be tested after mocking the response
+  # describe "#destory" do
+  #   it "deletes an existing project" do
+  #     entity = Productive::Project.find(399787)  
+  #     result = entity.destroy
+  #     expect(result).to be_nil 
+  #   end
+  # end
+
+  # describe ".copy" do
+  #   it "replicates an existing project" do
+  #     entity = Productive::Project.find(399787)  
+  #     result = entity.copy
+  #     expect(result).to be_an_instance_of(Productive::Project)
+  #   end
+  # end
+# =end
 end
