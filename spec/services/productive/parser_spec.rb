@@ -4,42 +4,9 @@ RSpec.describe Productive::Parser, type: :request do
 # =begin
   describe '.parse_response' do
     context 'when the block execution is successful' do
-      it 'does not raise an error' do
-        data = 
-          '{
-            "data": {
-              "id": 399787,
-              "type": "projects",
-              "attributes": {
-                "name": "Update project",
-                "number": 1,
-                "project_number": 1,
-                "project_type_id": 1,
-                "project_color_id": 9
-              },
-              "relationships": {
-                "organization": {
-                  "data": {
-                    "type": "organizations",
-                    "id": 31810
-                  }
-                },
-                "workflow": {
-                  "data": {
-                    "type": "workflows",
-                    "id": 32544
-                  }
-                },
-                "memberships": {
-                  "data": {
-                    "type": "memberships",
-                    "id": 6368022
-                  }
-                }
-              }
-            }
-          }'
+      let(:data){ File.read('./spec/fixtures/response.json') }
 
+      it 'does not raise an error' do
         expect do
           Productive::Parser.parse_response do
             JSON.parse(data).dig('data')
@@ -49,43 +16,9 @@ RSpec.describe Productive::Parser, type: :request do
     end
 
     context 'when the block execution raises JSON::ParserError' do
-      it 'rescues the error and logs it' do
-        data = 
-          '<?xml version="1.0" encoding="UTF-8" ?>
-          <root>
-            <data>
-              <id>399787</id>
-              <type>projects</type>
-              <attributes>
-                <name>Update project</name>
-                <number>1</number>
-                <project_number>1</project_number>
-                <project_type_id>1</project_type_id>
-                <project_color_id>9</project_color_id>
-              </attributes>
-              <relationships>
-                <organization>
-                  <data>
-                    <type>organizations</type>
-                    <id>31810</id>
-                  </data>
-                </organization>
-                <workflow>
-                  <data>
-                    <type>workflows</type>
-                    <id>32544</id>
-                  </data>
-                </workflow>
-                <memberships>
-                  <data>
-                    <type>memberships</type>
-                    <id>6368022</id>
-                  </data>
-                </memberships>
-              </relationships>
-            </data>
-          </root>'
+      let(:data) { File.read('./spec/fixtures/response.xml') } 
 
+      it 'rescues the error and logs it' do
         allow(Rails.logger).to receive(:error)
 
         response_data = Productive::Parser.parse_response do
