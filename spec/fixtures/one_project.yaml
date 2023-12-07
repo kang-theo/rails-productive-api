@@ -1,0 +1,58 @@
+code: 200
+body:
+  data:
+    id: '399787'
+    type: projects
+    attributes:
+      name: Update project
+      number: '1'
+      project_number: '1'
+      project_type_id: 1
+      project_color_id: 9
+      last_activity_at: '2023-12-06T02:09:20.000+01:00'
+      public_access: true
+      time_on_tasks: false
+      tag_colors: {}
+      archived_at: null
+      created_at: '2023-11-28T01:04:43.344+01:00'
+      template: false
+      budget_closing_date: null
+      needs_invoicing: false
+      custom_fields: null
+      task_custom_fields_ids: null
+      sample_data: true
+    relationships:
+      organization:
+        data:
+          type: organizations
+          id: '31810'
+      company:
+        data:
+          type: companies
+          id: '699398'
+      project_manager:
+        data:
+          type: people
+          id: '561888'
+      last_actor:
+        data:
+          type: people
+          id: '561886'
+      workflow:
+        data:
+          type: workflows
+          id: '32544'
+      custom_field_people:
+        data: []
+      memberships:
+        data:
+          - type: memberships
+            id: '6368022'
+          - type: memberships
+            id: '6368023'
+          - type: memberships
+            id: '6368024'
+          - type: memberships
+            id: '6450128'
+      template_object:
+        data: null

@@ -1,9 +1,15 @@
 require 'rails_helper'
+require 'yaml'
+require 'httparty'
 
 RSpec.describe Productive::Project, type: :model do
 # =begin
   describe '#initialize' do
     context 'instantiate a project for creating a new project' do
+      # TODO: using FactoryBot to create a project
+      let(:attributes){ {name: 'Create project x', project_type_id: 1, project_manager_id: '561888', company_id: '699400', workflow_id: '32544'} }
+      let(:association_info){ {'project_manager' => '561888', 'company' => '699400', 'workflow' => '32544'} }
+
       it 'creates an instance with default attributes' do
         entity = Productive::Project.new
         # getter(create_accessors) and default value
@@ -15,7 +21,6 @@ RSpec.describe Productive::Project, type: :model do
       end
 
       it 'creates instance with provided attributes' do
-        attributes = { name: 'Create project x', project_type_id: 1, project_manager_id: '561888', company_id: '699400', workflow_id: '32544'}
         entity = Productive::Project.new(attributes)
         #create_accessors - getter
         expect(entity.name).to eq('Create project x')
@@ -33,8 +38,6 @@ RSpec.describe Productive::Project, type: :model do
 
       #define_associations
       it 'defines associations' do
-        attributes = { name: 'Create project x', project_type_id: 1, project_manager_id: '561888', company_id: '699400', workflow_id: '32544'}
-        association_info = {'project_manager' => '561888', 'company' => '699400', 'workflow' => '32544'}
         entity = Productive::Project.new(attributes, association_info) 
 
         expect(entity).to respond_to(:project_manager)
@@ -67,8 +70,22 @@ RSpec.describe Productive::Project, type: :model do
       # allow(Productive::HttpClient).to receive(:get).and_return('success')
       # expect(Productive::HttpClient).to receive(:get).with('projects')
       # mock
-      # Productive::Project.all
-      entities = Productive::Project.all
+
+      # all_projects = File.read('./spec/fixtures/all_projects.yaml')
+      # data = YAML.safe_load(all_projects)
+      # one_project = File.read('./spec/fixtures/one_project.yaml')
+      # data = OpenStruct.new(YAML.safe_load(one_project))
+
+      # # stub the HTTParty.get method to return a fake response
+      # allow(HttpClient).to receive(:get).and_return(data.body)
+
+      # TODO: use Faker to generate fake data
+      # for non-active-record model, use build_list instaead of create_list
+      projects = FactoryBot.build_list(:project, 5)
+      # stub the handle_response method to return a specific result
+      allow(Parser).to receive(:handle_response).and_return(projects)
+
+      # entities = Productive::Project.all
       entity = entities.first
       expect(entity).to be_an_instance_of(Productive::Project)
     end
@@ -83,7 +100,7 @@ RSpec.describe Productive::Project, type: :model do
 
     it 'sends a GET request for a specific entity with invalid id' do
       # mock
-      entity = Productive::Project.find(123)
+      entity = Productive::Project.find(-1)
       expect(entity).to be_nil
     end
   end
@@ -107,6 +124,7 @@ RSpec.describe Productive::Project, type: :model do
         result = entity.save
 
         # assert
+        # TODO: need to verify the id created, this is an important change
         expect(result).to equal(entity)
         expect(result.name).to eq("New project")
         expect(result.company_id).to eq("699400")
@@ -125,13 +143,14 @@ RSpec.describe Productive::Project, type: :model do
         result = entity.save
 
         # assert
+        # TODO: need to verify the id
         expect(result).to equal(entity)
         expect(result.name).to eq("Update project")
         expect(result.project_manager_id ).to eq("561888")
       end
 
       it 'updates an non-existing entity' do
-        entity = Productive::Project.find(123)
+        entity = Productive::Project.find(-1)
         expect(entity).to be_nil
       end
     end
@@ -227,7 +246,7 @@ RSpec.describe Productive::Project, type: :model do
     end
 
     it "archives an non-existing project" do
-      entity = Productive::Project.find(123)  
+      entity = Productive::Project.find(-1)  
       expect(entity).to be_nil 
     end
   end
