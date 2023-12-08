@@ -5,6 +5,7 @@ module Productive
     include Common
     include Parser
 
+    # TODO: can be defined in class directly
     def changes
       @changes ||= {}
     end
@@ -26,6 +27,14 @@ module Productive
       define_associations(association_info) if association_info.present?
     end
 
+    # ActiveRecord style assign_attributes
+    def assign_attributes(attributes)
+      attributes.each do |key, value|
+        send("#{key}=", value) if respond_to?("#{key}=")
+      end
+    end
+
+    # customize the output of the object
     def inspect
       attributes_to_exclude = [:@changed_attrs, :@changed_relationships, :@changes]
       filtered_instance_variables = instance_variables.reject do |var|

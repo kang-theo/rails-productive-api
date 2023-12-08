@@ -124,26 +124,41 @@ RSpec.describe Productive::Project, type: :model do
 
   describe '#save' do
     context 'POST request with valid attributes' do
+      let(:attributes) do
+        {
+          name: 'New project',
+          project_type_id: 1,
+          project_manager_id: '561888',
+          company_id: '699398',
+          workflow_id: '32544'
+        }
+      end
+
+      let(:response_create) do
+        one_project = File.read('./spec/fixtures/create_project.yaml')
+        OpenStruct.new(YAML.safe_load(one_project))
+      end
+
+      let(:response_update) do
+        one_project = File.read('./spec/fixtures/update_project.yaml')
+        OpenStruct.new(YAML.safe_load(one_project))
+      end
+
+      before do
+        # stub
+        allow(Productive::HttpClient).to receive(:post).and_return(response_create)
+        allow(Productive::HttpClient).to receive(:patch).and_return(response_update)
+      end
+
       it 'creates a new entity' do
         # arrange
         entity = Productive::Project.new
-        entity.name = 'New project'
-        entity.project_type_id = 1
-        entity.project_manager_id = '561888'
-        entity.company_id = '699398'
-        entity.workflow_id = '32544'
-
-        # stub
-        one_project = File.read('./spec/fixtures/create_project.yaml')
-        response = OpenStruct.new(YAML.safe_load(one_project))
-
-        allow(Productive::HttpClient).to receive(:post).and_return(response)
-        allow(Productive::HttpClient).to receive(:patch).and_return(response)
+        # like ActiveRecord, implement assign_attributes in plain class to trigger setter methods in order to track changed attributes
+        entity.assign_attributes(attributes)
 
         # act
         result = entity.save
 
-        debugger
         # assert
         expect(result.id).to eq("399787")
         expect(result.name).to eq("New project")
@@ -153,18 +168,7 @@ RSpec.describe Productive::Project, type: :model do
       it 'updates an existing entity' do
         # arrange
         entity = Productive::Project.find(399787)
-        entity.name = 'Update project'
-        entity.project_type_id = 1
-        entity.project_manager_id = '561888'
-        entity.company_id = '699398'
-        entity.workflow_id = '32544'
-
-        # stub
-        one_project = File.read('./spec/fixtures/update_project.yaml')
-        response = OpenStruct.new(YAML.safe_load(one_project))
-
-        allow(Productive::HttpClient).to receive(:post).and_return(response)
-        allow(Productive::HttpClient).to receive(:patch).and_return(response)
+        entity.assign_attributes(attributes.merge!({name: 'Updata project', project_manager_id: '561889'}))
 
         # act
         result = entity.save
@@ -172,7 +176,7 @@ RSpec.describe Productive::Project, type: :model do
         # assert
         expect(result.id).to eq("399787")
         expect(result.name).to eq("Update project")
-        expect(result.project_manager_id ).to eq("561888")
+        expect(result.project_manager_id ).to eq("561889")
       end
 
       it 'updates an non-existing entity' do
