@@ -60,7 +60,7 @@
 FactoryBot.define do
   factory :project, class: Productive::Project do
     attributes = { 
-      id: Faker::Number.unique.number(digits: 6),
+      id: '399787', # id is used to verify, so do not fake
       name: Faker::Lorem.words(number: 2).join(' '),
       number: Faker::Number.unique.number(digits: 2),
       project_number: Faker::Number.unique.number(digits: 2),

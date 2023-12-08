@@ -3,10 +3,8 @@ require 'yaml'
 require 'httparty'
 
 RSpec.describe Productive::Project, type: :model do
-# =begin
   describe '#initialize' do
     context 'instantiate a project for creating a new project' do
-      # TODO: using FactoryBot to create a project
       let(:attributes){ {name: 'Create project x', project_type_id: 1, project_manager_id: '561888', company_id: '699400', workflow_id: '32544'} }
       let(:association_info){ {'project_manager' => '561888', 'company' => '699400', 'workflow' => '32544'} }
 
@@ -124,7 +122,7 @@ RSpec.describe Productive::Project, type: :model do
 
   describe '#save' do
     context 'POST request with valid attributes' do
-      let(:attributes) do
+      let(:valid_attributes) do
         {
           name: 'New project',
           project_type_id: 1,
@@ -154,7 +152,7 @@ RSpec.describe Productive::Project, type: :model do
         # arrange
         entity = Productive::Project.new
         # like ActiveRecord, implement assign_attributes in plain class to trigger setter methods in order to track changed attributes
-        entity.assign_attributes(attributes)
+        entity.assign_attributes(valid_attributes)
 
         # act
         result = entity.save
@@ -167,8 +165,13 @@ RSpec.describe Productive::Project, type: :model do
 
       it 'updates an existing entity' do
         # arrange
+        allow(Productive::HttpClient).to receive(:get).and_return(nil)
+        project = FactoryBot.build_list(:project, 1)
+        allow(Productive::Parser).to receive(:handle_response).and_return(project)
+
         entity = Productive::Project.find(399787)
-        entity.assign_attributes(attributes.merge!({name: 'Updata project', project_manager_id: '561889'}))
+        # update specified attrs and assign them to entity
+        entity.assign_attributes(valid_attributes.merge!({name: 'Update project', project_manager_id: '561889'}))
 
         # act
         result = entity.save
@@ -189,73 +192,42 @@ RSpec.describe Productive::Project, type: :model do
     end
 
     context 'POST request with invalid attributes, lacking required params' do
+      let(:invalid_attributes) do
+        { 
+          name: 'New project',
+          project_manager_id: '561888'
+        }
+      end
+
+      before do
+        allow(Productive::HttpClient).to receive(:post).and_return(nil)
+        allow(Productive::HttpClient).to receive(:patch).and_return(nil)
+      end
+
       it 'creates a new entity with some required attributes missing' do
         # arrange
         entity = Productive::Project.new
-        entity.name = 'New project'
-        entity.project_manager_id = '561888'
+        entity.assign_attributes(invalid_attributes)
 
-        # mock: try to mock a HTTParty::Response
-        # mocked_response = HTTParty::Response.new(
-        #   # code: 200,
-        #   # parsed_response: 
-        # {
-        #   "data": {
-        #     "id": 399787,
-        #     "type": "projects",
-        #     "attributes": {
-        #       "name": "Update project",
-        #       "number": 1,
-        #       "project_number": 1,
-        #       "project_type_id": 1,
-        #       "project_color_id": 9
-        #     },
-        #     "relationships": {
-        #       "organization": {
-        #         "data": {
-        #           "type": "organizations",
-        #           "id": 31810
-        #         }
-        #       },
-        #       "workflow": {
-        #         "data": {
-        #           "type": "workflows",
-        #           "id": 32544
-        #         }
-        #       },
-        #       "memberships": {
-        #         "data": {
-        #           "type": "memberships",
-        #           "id": 6368022
-        #         }
-        #       }
-        #     }
-        #   }
-        # }
-          #   # parsed_response: {"data":{"id":"399787","type":"projects","attributes":{"name":"Update project"}}}
-          #   HTTParty::Request.new(Net::HTTP::Get, '/'), # request object
-          #   OpenStruct.new(body: '{"data": {"id": "123", "type": "projects"}}'), # response object
-          #   lambda { 'raw_response' }, # response block
-          #   200 # status code
-          # )
-          # allow(Productive::HttpClient).to receive(:post).and_return(mocked_response)
-          # expect(Productive::HttpClient).to receive(:post).with('projects', instance_of(String))
+        # stub
+        allow(Productive::Parser).to receive(:handle_response).and_return([])
 
-          # act
-          result = entity.save
+        # act
+        result = entity.save
 
         # assert
         expect(result).to be_nil
       end
 
       it 'updates an existing entity without changing anything' do
-        # arrange
+        # arrange, handle_response return an array, so build_list is approparate here
+        project = FactoryBot.build_list(:project, 1)
+        allow(Productive::Parser).to receive(:handle_response).and_return(project)
+
         entity = Productive::Project.find(399787)
-        entity.name = 'Update project'
-        entity.company_id = '699400'
 
         # assert
-        expect{entity.save}.to raise_error(ApiRequestError, 'Attributes are blank.')
+        expect{ entity.save }.to raise_error(ApiRequestError, 'Attributes are blank.')
       end
     end
   end
@@ -263,8 +235,7 @@ RSpec.describe Productive::Project, type: :model do
   describe '#inspect' do
     it 'outputs a string representation of an object' do
       entity = Productive::Project.new
-      entity.name = "New name"
-      entity.company_id = "699401"  
+      entity.assign_attributes({name: 'New name', company_id: '699401'})
 
       expect(entity.inspect).not_to include("changed_attrs")
       expect(entity.inspect).not_to include("changed_relationships")
@@ -272,22 +243,58 @@ RSpec.describe Productive::Project, type: :model do
   end
 
   describe "#archive" do
+    before do
+      # http request stub
+      allow(Productive::HttpClient).to receive(:get).and_return(nil)
+      allow(Productive::HttpClient).to receive(:patch).and_return(nil)
+    end
+
     it "archives an existing project" do
-      entity = Productive::Project.find(399787)  
+      # mock
+      unarchived_project = FactoryBot.build(:project)
+      allow(Productive::Parser).to receive(:handle_response).and_return([unarchived_project])
+      # act
+      entity = Productive::Project.find(399787)
+
+      # mock
+      archived_project = FactoryBot.build(:project, :with_archived_at)
+      allow(Productive::Parser).to receive(:handle_response).and_return([archived_project])
+      # act
       result = entity.archive
+
+      # assert
       expect(result.archived_at).to_not be_nil 
     end
 
     it "archives an non-existing project" do
+      allow(Productive::Parser).to receive(:handle_response).and_return([])
+
       entity = Productive::Project.find(-1)  
       expect(entity).to be_nil 
     end
   end
 
   describe "#restore" do
+    before do
+      # http request stub
+      allow(Productive::HttpClient).to receive(:get).and_return(nil)
+      allow(Productive::HttpClient).to receive(:patch).and_return(nil)
+    end
+
     it "restores an existing project" do
-      entity = Productive::Project.find(399787)  
+      # mock
+      archived_project = FactoryBot.build(:project, :with_archived_at)
+      allow(Productive::Parser).to receive(:handle_response).and_return([archived_project])
+      # act
+      entity = Productive::Project.find(399787)
+
+      # mock
+      unarchived_project = FactoryBot.build(:project)
+      allow(Productive::Parser).to receive(:handle_response).and_return([unarchived_project])
+      # act
       result = entity.restore
+
+      # assert
       expect(result.archived_at).to be_nil 
     end
   end
@@ -308,5 +315,4 @@ RSpec.describe Productive::Project, type: :model do
   #     expect(result).to be_an_instance_of(Productive::Project)
   #   end
   # end
-# =end
 end

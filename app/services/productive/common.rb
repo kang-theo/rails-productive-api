@@ -41,12 +41,16 @@ module Productive
         !attr.start_with?("project") && (attr.end_with?("_id") || attr.end_with?("_ids"))
       end
 
+      # move to Base
       def track_change(attr, old_value, new_value)
         changes
         @changes[attr] = new_value if old_value != new_value
       end
 
+      # TODO: change to payload
       def build_payload
+        # TODO: define when you use it, it is not correct in OOP, the correct logic should be:
+        # TODO: you already have when you use it, this can be instance variables.
         changed_attrs
         changed_relationships
 
@@ -73,6 +77,7 @@ module Productive
         payload.to_json
       end
 
+      # TODO: this method returns the constructed relationships, so the method name can be "relationships, do not need the build verb"
       def build_relationships
         relationships_array = changed_relationships.map do |k, v| 
           association_info = ENTITY_RELATIONSHIP.find { |param| param[:relationship_id] == k.to_s }
@@ -131,17 +136,6 @@ module Productive
         !self.respond_to?(:id)
       end
 
-      def handle_request
-        case new? ? :create : :update
-        when :create
-          HttpClient.post("#{path}", build_payload)
-        when :update
-          HttpClient.patch("#{path}/#{id}", build_payload)
-        else
-          raise ApiRequestError, 'Undefined action.'
-        end
-      end
-
       # TODO: need to validate the required uri parameters
       # Refer to active-record style
       # Example: create
@@ -163,8 +157,23 @@ module Productive
       def save
         response = handle_request
 
-        return self if response.success?
-        nil
+        entities = Parser.handle_response(response, self)
+
+        return nil if entities.empty?
+        entities.first
+      end
+
+      private
+
+      def handle_request
+        case new? ? :create : :update
+        when :create
+          HttpClient.post("#{path}", build_payload)
+        when :update
+          HttpClient.patch("#{path}/#{id}", build_payload)
+        else
+          raise ApiRequestError, 'Undefined action.'
+        end
       end
     end
   end
