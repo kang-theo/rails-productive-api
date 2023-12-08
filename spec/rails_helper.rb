@@ -8,7 +8,7 @@ SimpleCov.start do |source_file|
 end
 
 require 'factory_bot'
-require 'webmock/rspec'
+# require 'webmock/rspec'
 require File.expand_path('../config/environment', __dir__)
 
 ENV['RAILS_ENV'] ||= 'test'

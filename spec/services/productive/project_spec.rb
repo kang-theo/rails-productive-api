@@ -44,23 +44,31 @@ RSpec.describe Productive::Project, type: :model do
       end
     end
 
-    # TODO: to be tested after mocking response
-    # context 'instantiate a project based on info from the API response' do
-    #   it 'creates an instance with default attributes' do
-    #     entity = Productive::Project.new
-    #     expect(entity.name).to eq('')
-    #     expect(entity.project_type_id).to be_nil
-    #     # ... other default attributes
-    #   end
+    context 'instantiate a project based on info from the API response' do
+      # let(:attributes){ {"name"=>"New project", "number"=>"1", "project_number"=>"1", "project_type_id"=>1, "project_color_id"=>9, "last_activity_at"=>"2023-12-08T06:04:20.000+01:00", "public_access"=>true, "time_on_tasks"=>false, "tag_colors"=>{}, "archived_at"=>nil, "created_at"=>"2023-11-28T01:04:43.344+01:00", "template"=>false, "budget_closing_date"=>nil, "needs_invoicing"=>false, "custom_fields"=>nil, "task_custom_fields_ids"=>nil, "sample_data"=>true, "id"=>"399787", "organization_id"=>"31810", "company_id"=>"699398", "project_manager_id"=>"561888", "last_actor_id"=>"561886", "workflow_id"=>"32544", "membership_ids"=>["6368022", "6368023", "6368024", "6450128"]} }
+      # let(:association_info){ {"organization"=>"31810", "company"=>"699398", "project_manager"=>"561888", "last_actor"=>"561886", "workflow"=>"32544", "memberships"=>["6368022", "6368023", "6368024", "6450128"]} }
+      all_projects = File.read('./spec/fixtures/all_projects.yaml')
+      response = OpenStruct.new(YAML.safe_load(all_projects))
 
-    #   it 'creates instance with provided attributes' do
-    #     attributes = { name: 'Project X', project_type_id: 1, project_manager_id: '123' }
-    #     entity = Productive::Project.new(attributes)
-    #     expect(entity.name).to eq('Project X')
-    #     expect(entity.project_type_id).to eq(1)
-    #     expect(entity.project_manager_id).to eq('123')
-    #   end
-    # end
+      it 'creates an instance with API response' do
+        # expect(Productive::Project).to receive(:new).with(attributes, association_info)
+        entities = Productive::Parser.handle_response(response, Productive::Project)
+        # entity = Productive::Project.new(attributes, association_info)
+
+        debugger
+        expect(entity.name).to eq('New project')
+        expect(entity.project_type_id).to eq(2)
+        expect(entity.company_id).to eq('699398')
+      end
+
+      it 'creates instance with provided attributes' do
+        attributes = { name: 'Project X', project_type_id: 1, project_manager_id: '123' }
+        entity = Productive::Project.new(attributes)
+        expect(entity.name).to eq('Project X')
+        expect(entity.project_type_id).to eq(1)
+        expect(entity.project_manager_id).to eq('123')
+      end
+    end
   end
 
   describe '.all' do
