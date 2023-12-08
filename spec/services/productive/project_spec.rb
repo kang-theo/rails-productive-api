@@ -68,21 +68,22 @@ RSpec.describe Productive::Project, type: :model do
   describe '.all' do
     it 'sends a GET request for all entities' do
       # Mock:
-      # 1. get data as return value of WebMock
+      # 1. [mock] get data as return value
       all_projects = File.read('./spec/fixtures/all_projects.yaml')
       data = OpenStruct.new(YAML.safe_load(all_projects))
 
-      # 2. intercept requests and return specified fake data; all methods that will be called by .all need to be stubbed
+      # 2. [stub] intercept requests and return specified fake data; all methods that will be called by .all need to be stubbed
       # stub the HTTParty.get method to return a fake response
       allow(Productive::HttpClient).to receive(:get).and_return(data.body)
 
-      # for non-active-record model, use build_list instaead of create_list
+      # 3. [mock] for non-active-record model, use build_list instaead of create_list
       projects = FactoryBot.build_list(:project, 5)
-      # stub the handle_response method to return a specific result
+      # 4. [stub] stub the handle_response method to return a specific result
       allow(Productive::Parser).to receive(:handle_response).and_return(projects)
+      # expect(Productive::Parser).to receive(:handle_response).with(data.body, Productive::Project)
 
       # Act
-      # 3. call the method, when methods above are called, they will be intercepted
+      # 5. call the method, when methods above are called, they will be intercepted
       entities = Productive::Project.all
       entity = entities.first
 
@@ -92,16 +93,30 @@ RSpec.describe Productive::Project, type: :model do
   end
 
   describe '.find' do
-      # one_project = File.read('./spec/fixtures/one_project.yaml')
-      # data = OpenStruct.new(YAML.safe_load(one_project))
     it 'sends a GET request for a specific entity with valid id' do
-      # mock
-      entity = Productive::Project.find(399787)
+      # Mock
+      # just stub it
+      allow(Productive::HttpClient).to receive(:get).and_return(nil)
+
+      project = FactoryBot.build_list(:project, 1)
+      allow(Productive::Parser).to receive(:handle_response).and_return(project)
+
+      # Act
+      entity = Productive::Project.find("any_id")
+
+      # Assert
       expect(entity).to be_an_instance_of(Productive::Project)
     end
 
     it 'sends a GET request for a specific entity with invalid id' do
       # mock
+      # not_found = File.read('./spec/fixtures/404_not_found.json')
+      # data = OpenStruct.new(JSON.parse(not_found))
+      # allow(Productive::HttpClient).to receive(:get).and_return(data.body)
+      allow(Productive::HttpClient).to receive(:get).and_return(nil)
+
+      allow(Productive::Parser).to receive(:handle_response).and_return([])
+
       entity = Productive::Project.find(-1)
       expect(entity).to be_nil
     end
@@ -115,21 +130,24 @@ RSpec.describe Productive::Project, type: :model do
         entity.name = 'New project'
         entity.project_type_id = 1
         entity.project_manager_id = '561888'
-        entity.company_id = '699400'
+        entity.company_id = '699398'
         entity.workflow_id = '32544'
 
-        # mock
-        # allow(Productive::HttpClient).to receive(:post).and_return('success')
-        # expect(Productive::HttpClient).to receive(:post).with('projects', instance_of(String))
+        # stub
+        one_project = File.read('./spec/fixtures/create_project.yaml')
+        response = OpenStruct.new(YAML.safe_load(one_project))
+
+        allow(Productive::HttpClient).to receive(:post).and_return(response)
+        allow(Productive::HttpClient).to receive(:patch).and_return(response)
 
         # act
         result = entity.save
 
+        debugger
         # assert
-        # TODO: need to verify the id created, this is an important change
-        expect(result).to equal(entity)
+        expect(result.id).to eq("399787")
         expect(result.name).to eq("New project")
-        expect(result.company_id).to eq("699400")
+        expect(result.company_id).to eq("699398")
       end
 
       it 'updates an existing entity' do
@@ -138,20 +156,29 @@ RSpec.describe Productive::Project, type: :model do
         entity.name = 'Update project'
         entity.project_type_id = 1
         entity.project_manager_id = '561888'
-        entity.company_id = '699400'
+        entity.company_id = '699398'
         entity.workflow_id = '32544'
+
+        # stub
+        one_project = File.read('./spec/fixtures/update_project.yaml')
+        response = OpenStruct.new(YAML.safe_load(one_project))
+
+        allow(Productive::HttpClient).to receive(:post).and_return(response)
+        allow(Productive::HttpClient).to receive(:patch).and_return(response)
 
         # act
         result = entity.save
 
         # assert
-        # TODO: need to verify the id
-        expect(result).to equal(entity)
+        expect(result.id).to eq("399787")
         expect(result.name).to eq("Update project")
         expect(result.project_manager_id ).to eq("561888")
       end
 
       it 'updates an non-existing entity' do
+        allow(Productive::HttpClient).to receive(:patch).and_return(nil)
+        allow(Productive::Parser).to receive(:handle_response).and_return([])
+
         entity = Productive::Project.find(-1)
         expect(entity).to be_nil
       end

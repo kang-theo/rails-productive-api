@@ -1,0 +1,16 @@
+{
+  "code": 404,
+  "body": {
+    "errors": [
+      {
+        "status": "404",
+        "code": "record_not_found",
+        "title": "Record Not Found",
+        "detail": "The requested record was not found",
+        "source": {
+          "pointer": null
+        }
+      }
+    ]
+  }
+}
