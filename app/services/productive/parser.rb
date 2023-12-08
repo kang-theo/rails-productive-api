@@ -5,7 +5,7 @@ module Productive
     def self.handle_response(response, klass)
       return [] unless response.code == 200
       
-      parsed_data = parse_response { JSON.parse(response.body).dig('data') }
+      parsed_data = response.body.dig('data')
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
       entities = flatten_data.map do |data_hash|
@@ -21,15 +21,6 @@ module Productive
     end
 
     private
-
-    def self.parse_response
-      begin
-        yield
-      rescue JSON::ParserError => e
-        Rails.logger.error "JSON::ParserError: #{e.message}"
-        { error: 'JSON::ParserError', status: :bad_response }
-      end
-    end
 
     # Parses associations from a hash.
     #
