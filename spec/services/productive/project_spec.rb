@@ -67,31 +67,33 @@ RSpec.describe Productive::Project, type: :model do
 
   describe '.all' do
     it 'sends a GET request for all entities' do
-      # allow(Productive::HttpClient).to receive(:get).and_return('success')
-      # expect(Productive::HttpClient).to receive(:get).with('projects')
-      # mock
+      # Mock:
+      # 1. get data as return value of WebMock
+      all_projects = File.read('./spec/fixtures/all_projects.yaml')
+      data = OpenStruct.new(YAML.safe_load(all_projects))
 
-      # all_projects = File.read('./spec/fixtures/all_projects.yaml')
-      # data = YAML.safe_load(all_projects)
-      # one_project = File.read('./spec/fixtures/one_project.yaml')
-      # data = OpenStruct.new(YAML.safe_load(one_project))
+      # 2. intercept requests and return specified fake data; all methods that will be called by .all need to be stubbed
+      # stub the HTTParty.get method to return a fake response
+      allow(Productive::HttpClient).to receive(:get).and_return(data.body)
 
-      # # stub the HTTParty.get method to return a fake response
-      # allow(HttpClient).to receive(:get).and_return(data.body)
-
-      # TODO: use Faker to generate fake data
       # for non-active-record model, use build_list instaead of create_list
       projects = FactoryBot.build_list(:project, 5)
       # stub the handle_response method to return a specific result
-      allow(Parser).to receive(:handle_response).and_return(projects)
+      allow(Productive::Parser).to receive(:handle_response).and_return(projects)
 
-      # entities = Productive::Project.all
+      # Act
+      # 3. call the method, when methods above are called, they will be intercepted
+      entities = Productive::Project.all
       entity = entities.first
+
+      # Assert
       expect(entity).to be_an_instance_of(Productive::Project)
     end
   end
 
   describe '.find' do
+      # one_project = File.read('./spec/fixtures/one_project.yaml')
+      # data = OpenStruct.new(YAML.safe_load(one_project))
     it 'sends a GET request for a specific entity with valid id' do
       # mock
       entity = Productive::Project.find(399787)
