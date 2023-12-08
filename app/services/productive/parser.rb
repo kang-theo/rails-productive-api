@@ -3,7 +3,7 @@
 module Productive
   module Parser
     def self.handle_response(response, klass)
-      return [] unless response.success?
+      return [] unless response.code == 200
       
       parsed_data = parse_response { JSON.parse(response.body).dig('data') }
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]

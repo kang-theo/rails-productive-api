@@ -1,5 +1,6 @@
 module Productive
   module HttpClient
+    # TODO: use base_uri to replace endpoint, reducing the #{@@endpoint} in the code
     @@endpoint = PRODUCTIVE_CONF['endpoint']
     @@headers = PRODUCTIVE_CONF['auth_info']
 
@@ -10,11 +11,17 @@ module Productive
 
       if cached_result.nil?
         Rails.logger.info("HTTP Request: #{@@endpoint}/#{req_params}")
+
+        # response is a HTTParty.Response object
         response = HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
 
-        Rails.cache.write(cache_key, response, expires_in: 1.hour)
+        # uniformly convert to an OpenStruct object, with response code and body
+        # http_response = OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
+        http_response = OpenStruct.new({"code"=>response.code, "body"=>response.body})
 
-        return response
+        Rails.cache.write(cache_key, http_response, expires_in: 1.hour)
+
+        return http_response
       else
         Rails.logger.info("Cached result found for #{cache_key}")
         return cached_result
