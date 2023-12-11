@@ -1,6 +1,4 @@
 require 'rails_helper'
-require 'yaml'
-require 'httparty'
 
 RSpec.describe Productive::Project, type: :model do
   describe '#initialize' do
@@ -187,7 +185,7 @@ RSpec.describe Productive::Project, type: :model do
       end
 
       it 'updates an non-existing entity' do
-        allow(Productive::HttpClient).to receive(:patch).and_return(nil)
+        allow(Productive::HttpClient).to receive(:get).and_return(nil)
         allow(Productive::Parser).to receive(:handle_response).and_return([])
 
         entity = Productive::Project.find(-1)
@@ -224,7 +222,9 @@ RSpec.describe Productive::Project, type: :model do
       end
 
       it 'updates an existing entity without changing anything' do
-        # arrange, handle_response return an array, so build_list is approparate here
+        # arrange
+        allow(Productive::HttpClient).to receive(:get).and_return(nil)
+        # handle_response return an array, so build_list is approparate here
         project = FactoryBot.build_list(:project, 1)
         allow(Productive::Parser).to receive(:handle_response).and_return(project)
 
@@ -303,7 +303,6 @@ RSpec.describe Productive::Project, type: :model do
     end
   end
 
-  # TODO: to be tested after mocking the response
   # describe "#destory" do
   #   it "deletes an existing project" do
   #     entity = Productive::Project.find(399787)  

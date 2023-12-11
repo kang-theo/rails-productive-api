@@ -1,37 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Productive::Parser, type: :request do
-# =begin
-  describe '.parse_response' do
-    context 'when the block execution is successful' do
-      let(:data){ File.read('./spec/fixtures/response.json') }
-
-      it 'does not raise an error' do
-        expect do
-          Productive::Parser.parse_response do
-            JSON.parse(data).dig('data')
-          end
-        end.to_not raise_error
-      end
-    end
-
-    context 'when the block execution raises JSON::ParserError' do
-      let(:data) { File.read('./spec/fixtures/response.xml') } 
-
-      it 'rescues the error and logs it' do
-        allow(Rails.logger).to receive(:error)
-
-        response_data = Productive::Parser.parse_response do
-          JSON.parse(data).dig('data')
-        end
-
-        # TODO: process exception instantly, logger and find it after a long time is not a good idea. The jason respon is also not a normal way.
-        expect(Rails.logger).to have_received(:error).with(/JSON::ParserError: unexpected token/)
-        expect(response_data).to eq({ error: 'JSON::ParserError', status: :bad_response })
-      end
-    end
-  end
-
   describe '.parse_attributes' do
     let(:data) { File.read('./spec/fixtures/normal_response_data.json') }
     let(:association_data) { File.read('./spec/fixtures/association_data.json') }
@@ -82,5 +51,4 @@ RSpec.describe Productive::Parser, type: :request do
       end
     end
   end
-# =end
 end

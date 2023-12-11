@@ -15,8 +15,7 @@ module Productive
         # response is a HTTParty.Response object
         response = HTTParty.get("#{@@endpoint}/#{req_params}", headers: @@headers)
 
-        # uniformly convert to an OpenStruct object, with response code and body
-        # http_response = OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
+        # uniformly convert to an OpenStruct object, with response code and body as hash
         http_response = OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
 
         Rails.cache.write(cache_key, http_response, expires_in: 1.hour)
