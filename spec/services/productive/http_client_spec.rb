@@ -16,6 +16,10 @@ RSpec.describe Productive::HttpClient, type: :request do
           .with(headers: headers)
           .to_return(status: 200, body: api_response, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
+        # Stub: reduce the variation
+        allow(Rails).to receive_message_chain(:cache, :read).and_return(nil)
+        allow(Rails).to receive_message_chain(:cache, :write).and_return(nil)
+
         # Act
         # # 1. get response from WebMock
         # response = HTTParty.get("#{endpoint}/#{path}/#{id}", headers: headers)
