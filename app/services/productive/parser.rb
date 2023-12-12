@@ -4,7 +4,7 @@ module Productive
   module Parser
     def self.handle_response(response, klass)
       return [] unless response.code == 200
-      
+
       parsed_data = response.body.dig('data')
       flatten_data = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
 
@@ -34,12 +34,12 @@ module Productive
 
       relationships = data_hash['relationships']
       relationships.each do |key, value|
-        data = value["data"]
+        data = value['data']
         next if data.blank?
 
         # flatten_data = data.is_a?(Array) ? data : [data]
         # association_info[key] = flatten_data.map { |flatten_data| flatten_data["id"] }
-        association_info[key] = data.is_a?(Array) ? data.map { |datum| datum["id"] } : data["id"]
+        association_info[key] = data.is_a?(Array) ? data.map { |datum| datum['id'] } : data['id']
       end
 
       association_info
@@ -55,7 +55,7 @@ module Productive
     # @param [Hash] association_info: The hash containing association information.
     # @return [Hash] Parsed attributes.
     def self.parse_attributes(data_hash, association_info)
-      attributes = data_hash['attributes'].merge("id" => data_hash['id'])
+      attributes = data_hash['attributes'].merge('id' => data_hash['id'])
 
       association_info.each do |key, value|
         association_key = "#{key.singularize}_id#{'s' if value.is_a?(Array)}"

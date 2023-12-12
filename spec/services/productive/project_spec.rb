@@ -3,8 +3,19 @@ require 'rails_helper'
 RSpec.describe Productive::Project, type: :model do
   describe '#initialize' do
     context 'instantiate a project for creating a new project' do
-      let(:attributes){ {name: 'Create project x', project_type_id: 1, project_manager_id: '561888', company_id: '699400', workflow_id: '32544'} }
-      let(:association_info){ {'project_manager' => '561888', 'company' => '699400', 'workflow' => '32544'} }
+      let(:attributes) do
+        { name: 'Create project x',
+          project_type_id: 1,
+          project_manager_id: '561888',
+          company_id: '699400',
+          workflow_id: '32544' }
+      end
+      
+      let(:association_info) do
+        { 'project_manager' => '561888',
+          'company' => '699400',
+          'workflow' => '32544' } 
+      end
 
       it 'creates an instance with default attributes' do
         entity = Productive::Project.new
@@ -18,7 +29,7 @@ RSpec.describe Productive::Project, type: :model do
 
       it 'creates instance with provided attributes' do
         entity = Productive::Project.new(attributes)
-        #create_accessors - getter
+        # create_accessors - getter
         expect(entity.name).to eq('Create project x')
         expect(entity.project_type_id).to eq(1)
         expect(entity.project_manager_id).to eq('561888')
@@ -29,12 +40,12 @@ RSpec.describe Productive::Project, type: :model do
         entity.project_type_id = 2
         entity.project_manager_id = '561890'
         expect(entity.project_type_id).to eq(2)
-        expect(entity.project_manager_id).to eq('561890')  
+        expect(entity.project_manager_id).to eq('561890')
       end
 
-      #define_associations
+      # define_associations
       it 'defines associations' do
-        entity = Productive::Project.new(attributes, association_info) 
+        entity = Productive::Project.new(attributes, association_info)
 
         expect(entity).to respond_to(:project_manager)
         expect(entity).to respond_to(:company)
@@ -59,7 +70,7 @@ RSpec.describe Productive::Project, type: :model do
         ]
 
         expect(entities.zip(expectations)).to all(satisfy do |entity, expectation|
-          expect(entity).to have_attributes(expectation) 
+          expect(entity).to have_attributes(expectation)
         end)
       end
     end
@@ -102,7 +113,7 @@ RSpec.describe Productive::Project, type: :model do
       allow(Productive::Parser).to receive(:handle_response).and_return(project)
 
       # Act
-      entity = Productive::Project.find("any_id")
+      entity = Productive::Project.find('any_id')
 
       # Assert
       expect(entity).to be_an_instance_of(Productive::Project)
@@ -161,9 +172,9 @@ RSpec.describe Productive::Project, type: :model do
         result = entity.save
 
         # assert
-        expect(result.id).to eq("399787")
-        expect(result.name).to eq("New project")
-        expect(result.company_id).to eq("699398")
+        expect(result.id).to eq('399787')
+        expect(result.name).to eq('New project')
+        expect(result.company_id).to eq('699398')
       end
 
       it 'updates an existing entity' do
@@ -174,15 +185,15 @@ RSpec.describe Productive::Project, type: :model do
 
         entity = Productive::Project.find(399787)
         # update specified attrs and assign them to entity
-        entity.assign_attributes(valid_attributes.merge!({name: 'Update project', project_manager_id: '561889'}))
+        entity.assign_attributes(valid_attributes.merge!({ name: 'Update project', project_manager_id: '561889' }))
 
         # act
         result = entity.save
 
         # assert
-        expect(result.id).to eq("399787")
-        expect(result.name).to eq("Update project")
-        expect(result.project_manager_id ).to eq("561889")
+        expect(result.id).to eq('399787')
+        expect(result.name).to eq('Update project')
+        expect(result.project_manager_id).to eq('561889')
       end
 
       it 'updates an non-existing entity' do
@@ -196,7 +207,7 @@ RSpec.describe Productive::Project, type: :model do
 
     context 'POST request with invalid attributes, lacking required params' do
       let(:invalid_attributes) do
-        { 
+        {
           name: 'New project',
           project_manager_id: '561888'
         }
@@ -232,7 +243,7 @@ RSpec.describe Productive::Project, type: :model do
         entity = Productive::Project.find(399787)
 
         # assert
-        expect{ entity.save }.to raise_error(ApiRequestError, 'Attributes are blank.')
+        expect { entity.save }.to raise_error(ApiRequestError, 'Attributes are blank.')
       end
     end
   end
@@ -240,21 +251,21 @@ RSpec.describe Productive::Project, type: :model do
   describe '#inspect' do
     it 'outputs a string representation of an object' do
       entity = Productive::Project.new
-      entity.assign_attributes({name: 'New name', company_id: '699401'})
+      entity.assign_attributes({ name: 'New name', company_id: '699401' })
 
-      expect(entity.inspect).not_to include("changed_attrs")
-      expect(entity.inspect).not_to include("changed_relationships")
+      expect(entity.inspect).not_to include('changed_attrs')
+      expect(entity.inspect).not_to include('changed_relationships')
     end
   end
 
-  describe "#archive" do
+  describe '#archive' do
     before do
       # http request stub
       allow(Productive::HttpClient).to receive(:get).and_return(nil)
       allow(Productive::HttpClient).to receive(:patch).and_return(nil)
     end
 
-    it "archives an existing project" do
+    it 'archives an existing project' do
       # mock
       unarchived_project = FactoryBot.build(:project)
       allow(Productive::Parser).to receive(:handle_response).and_return([unarchived_project])
@@ -268,25 +279,25 @@ RSpec.describe Productive::Project, type: :model do
       result = entity.archive
 
       # assert
-      expect(result.archived_at).to_not be_nil 
+      expect(result.archived_at).to_not be_nil
     end
 
-    it "archives an non-existing project" do
+    it 'archives an non-existing project' do
       allow(Productive::Parser).to receive(:handle_response).and_return([])
 
-      entity = Productive::Project.find(-1)  
-      expect(entity).to be_nil 
+      entity = Productive::Project.find(-1)
+      expect(entity).to be_nil
     end
   end
 
-  describe "#restore" do
+  describe '#restore' do
     before do
       # http request stub
       allow(Productive::HttpClient).to receive(:get).and_return(nil)
       allow(Productive::HttpClient).to receive(:patch).and_return(nil)
     end
 
-    it "restores an existing project" do
+    it 'restores an existing project' do
       # mock
       archived_project = FactoryBot.build(:project, :with_archived_at)
       allow(Productive::Parser).to receive(:handle_response).and_return([archived_project])
@@ -300,23 +311,25 @@ RSpec.describe Productive::Project, type: :model do
       result = entity.restore
 
       # assert
-      expect(result.archived_at).to be_nil 
+      expect(result.archived_at).to be_nil
     end
   end
 
   # describe "#destory" do
   #   it "deletes an existing project" do
-  #     entity = Productive::Project.find(399787)  
+  #     entity = Productive::Project.find(399787)
   #     result = entity.destroy
-  #     expect(result).to be_nil 
+  #     expect(result).to be_nil
   #   end
   # end
 
   # describe ".copy" do
   #   it "replicates an existing project" do
-  #     entity = Productive::Project.find(399787)  
+  #     entity = Productive::Project.find(399787)
   #     result = entity.copy
   #     expect(result).to be_an_instance_of(Productive::Project)
   #   end
   # end
+
+  # TODO: add some other methods in Base class
 end

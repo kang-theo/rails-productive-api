@@ -20,10 +20,10 @@ module Productive
 
         Rails.cache.write(cache_key, http_response, expires_in: 1.hour)
 
-        return http_response
+        http_response
       else
         Rails.logger.info("Cached result found for #{cache_key}")
-        return cached_result
+        cached_result
       end
     end
 
@@ -33,21 +33,21 @@ module Productive
       refresh_cache(req_params)
 
       response = HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
-      OpenStruct.new({"code"=>response.code, "body"=>parse_response{ JSON.parse(response.body) }})
+      OpenStruct.new({ 'code' => response.code, 'body' => parse_response { JSON.parse(response.body) } })
     end
 
     def self.patch(req_params = {}, payload = {})
       refresh_cache(req_params)
 
       response = HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
-      OpenStruct.new({"code"=>response.code, "body"=>parse_response{ JSON.parse(response.body) }})
+      OpenStruct.new({ 'code' => response.code, 'body' => parse_response { JSON.parse(response.body) } })
     end
 
     def self.delete(req_params)
       refresh_cache(req_params)
 
       response = HTTParty.delete("#{@@endpoint}/#{req_params}", headers: @@headers)
-      OpenStruct.new({"code"=>response.code, "body"=>parse_response{ JSON.parse(response.body) }})
+      OpenStruct.new({ 'code' => response.code, 'body' => parse_response { JSON.parse(response.body) } })
     end
 
     private
@@ -60,11 +60,11 @@ module Productive
     end
 
     def self.parse_response
-      begin
-        yield
-      rescue JSON::ParserError => e
-        raise ApiResponseError, "Invalid JSON response from API: #{e.message}"
-      end
+begin
+      yield
+    rescue JSON::ParserError => e
+      raise ApiResponseError, "Invalid JSON response from API: #{e.message}"
     end
   end
+end
 end

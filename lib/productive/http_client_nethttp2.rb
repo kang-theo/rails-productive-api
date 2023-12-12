@@ -15,17 +15,14 @@ module Productive
 
         response = Net::HTTP.get_response(uri)
 
-        if response.is_a?(Net::HTTPSuccess)
-          return JSON.parse(response.body)
-        else
-          # Handle error cases
-          puts "Error: #{response.code}, #{response.message}"
-          return nil
-        end
+        return JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
+
+        # Handle error cases
+        puts "Error: #{response.code}, #{response.message}"
+        nil
       end
 
       # Other methods related to your API integration can go here
     end
-
   end
 end

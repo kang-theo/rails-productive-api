@@ -1,6 +1,6 @@
 # Assuming you have FactoryBot configured
 # class ProjectClass
-#   attr_accessor :id, :name, :number, :project_number, :project_type_id, :project_color_id, 
+#   attr_accessor :id, :name, :number, :project_number, :project_type_id, :project_color_id,
 #                 :last_activity_at, :public_access, :time_on_tasks, :tag_colors, :archived_at,
 #                 :created_at, :template, :budget_closing_date, :needs_invoicing, :custom_fields,
 #                 :task_custom_fields_ids, :sample_data, :organization_id, :company_id,
@@ -21,7 +21,7 @@
 # FactoryBot.define do
 #   factory :project, class: Productive::Project do
 #   # factory :project, class: ProjectClass do
-#     attributes = { 
+#     attributes = {
 #       id: '399821',
 #       name: 'create 1',
 #       number: '14',
@@ -59,7 +59,7 @@
 
 FactoryBot.define do
   factory :project, class: Productive::Project do
-    attributes = { 
+    attributes = {
       id: '399787', # id is used to verify, so do not fake
       name: Faker::Lorem.words(number: 2).join(' '),
       number: Faker::Number.unique.number(digits: 2),

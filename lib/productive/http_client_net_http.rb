@@ -7,7 +7,8 @@ module Productive
   module HttpClient
     extend LogUtils::Logging
     @@endpoint = 'https://api.productive.io/api/v2'
-    @@auth_info = {"X-Auth-Token": Rails.application.credentials.productive_api_token, "X-Organization-Id": Rails.application.credentials.organization_id.to_s, "Content-Type": 'application/vnd.api+json'}
+    @@auth_info = { "X-Auth-Token": Rails.application.credentials.productive_api_token,
+                    "X-Organization-Id": Rails.application.credentials.organization_id.to_s, "Content-Type": 'application/vnd.api+json' }
 
     def self.root
       "#{File.expand_path(File.dirname(File.dirname(File.dirname(__FILE__))))}"
@@ -20,7 +21,6 @@ module Productive
 
       opt = opt.merge(@@auth_info)
       a = Request.new.get("#{url}", opt)
- 
     end
 
     def self.post(url, payload = nil, opt = {})

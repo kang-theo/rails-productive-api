@@ -1,17 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe Productive::HttpClient, type: :request do
-  let(:endpoint){ PRODUCTIVE_CONF['endpoint'] }
-  let(:auth_info){ PRODUCTIVE_CONF['auth_info'] }
-  let(:headers){ auth_info.merge!({'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}) }
+  let(:endpoint) { PRODUCTIVE_CONF['endpoint'] }
+  let(:auth_info) { PRODUCTIVE_CONF['auth_info'] }
+  let(:headers) do
+    auth_info.merge!({ 'Accept' => '*/*',
+                       'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                       'User-Agent' => 'Ruby' })
+  end
 
   describe '.get' do
-    let(:path){ 'projects' }
-    let(:id){ '388797' }
+    let(:path) { 'projects' }
+    let(:id) { '388797' }
 
     context 'http request' do
-      let(:api_response){ File.read('spec/fixtures/response.json') }
-      let(:not_found){ File.read('spec/fixtures/404_not_found.json') }
+      let(:api_response) { File.read('spec/fixtures/response.json') }
+      let(:not_found) { File.read('spec/fixtures/404_not_found.json') }
 
       before do
         # Stub: reduce the variation
@@ -23,7 +27,7 @@ RSpec.describe Productive::HttpClient, type: :request do
         # WebMock
         stub_request(:get, %r{#{Regexp.quote(endpoint)}/.*})
           .with(headers: headers)
-          .to_return(status: 200, body: api_response, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
+          .to_return(status: 200, body: api_response, headers: { 'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
         # Act
         # # 1. get response from WebMock
@@ -34,13 +38,13 @@ RSpec.describe Productive::HttpClient, type: :request do
 
         # Assert
         expect(response.code).to eq(200)
-        expect(response.body).to eq(JSON.parse(api_response)) 
+        expect(response.body).to eq(JSON.parse(api_response))
       end
 
       it 'not found with invalid request params' do
         stub_request(:get, %r{#{Regexp.quote(endpoint)}/.*})
           .with(headers: headers)
-          .to_return(status: 400, body: not_found, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
+          .to_return(status: 400, body: not_found, headers: { 'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
         response = Productive::HttpClient.get("#{endpoint}/bad/path")
 
@@ -58,8 +62,8 @@ RSpec.describe Productive::HttpClient, type: :request do
 
   describe '.post' do
     context 'http request' do
-      let(:new_project){ File.read('spec/fixtures/response.json') }
-      let(:payload){ File.read('spec/fixtures/payload_for_create.json') }
+      let(:new_project) { File.read('spec/fixtures/response.json') }
+      let(:payload) { File.read('spec/fixtures/payload_for_create.json') }
 
       before do
         allow(Productive::HttpClient).to receive(:refresh_cache).and_return(nil)
@@ -69,7 +73,7 @@ RSpec.describe Productive::HttpClient, type: :request do
         # WebMock
         stub_request(:post, %r{#{Regexp.quote(endpoint)}/.*})
           .with(body: payload, headers: headers)
-          .to_return(status: 200, body: new_project, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
+          .to_return(status: 200, body: new_project, headers: { 'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
         # Act
         response = Productive::HttpClient.post("#{endpoint}/#{path}", payload)
@@ -83,8 +87,8 @@ RSpec.describe Productive::HttpClient, type: :request do
 
   describe '.patch' do
     context 'http request' do
-      let(:update_project){ File.read('spec/fixtures/response.json') }
-      let(:payload){ File.read('spec/fixtures/payload_for_create.json') }
+      let(:update_project) { File.read('spec/fixtures/response.json') }
+      let(:payload) { File.read('spec/fixtures/payload_for_create.json') }
 
       before do
         allow(Productive::HttpClient).to receive(:refresh_cache).and_return(nil)
@@ -94,7 +98,7 @@ RSpec.describe Productive::HttpClient, type: :request do
         # WebMock
         stub_request(:patch, %r{#{Regexp.quote(endpoint)}/.*})
           .with(body: payload, headers: headers)
-          .to_return(status: 200, body: update_project, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
+          .to_return(status: 200, body: update_project, headers: { 'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
         # Act
         response = Productive::HttpClient.patch("#{endpoint}/#{path}", payload)
@@ -108,13 +112,13 @@ RSpec.describe Productive::HttpClient, type: :request do
 
   # describe '.delete' do
   #   context 'http request' do
-    
+
   #   end
   # end
 
   describe '.parse_response' do
-    let(:valid_data){ File.read('./spec/fixtures/response.json') }
-    let(:invalid_data){ File.read('./spec/fixtures/response.xml') }
+    let(:valid_data) { File.read('./spec/fixtures/response.json') }
+    let(:invalid_data) { File.read('./spec/fixtures/response.xml') }
 
     it 'valid response format, does not raise an error' do
       expect do
@@ -123,7 +127,7 @@ RSpec.describe Productive::HttpClient, type: :request do
     end
 
     it 'invalid response format, raise an exception' do
-      expect do 
+      expect do
         Productive::HttpClient.parse_response { JSON.parse(invalid_data) }
       end.to raise_error(ApiResponseError, /Invalid JSON response from API/)
     end

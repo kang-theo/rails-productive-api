@@ -18,12 +18,11 @@ module Productive
     ]
 
     # module inclusion -----------------------------------------------------------
-    def Common.included(base) 
+    def self.included(base)
       base.extend ClassMethods
       base.include InstanceMethods
     end
 
-    
     # module definition ----------------------------------------------------------
     # shared methods
     module SharedMethods
@@ -38,7 +37,7 @@ module Productive
 
       def foreign_key?(attr)
         # TODO: refactor the method
-        !attr.start_with?("project") && (attr.end_with?("_id") || attr.end_with?("_ids"))
+        !attr.start_with?('project') && (attr.end_with?('_id') || attr.end_with?('_ids'))
       end
 
       def payload
@@ -66,7 +65,7 @@ module Productive
       end
 
       def relationships
-        relationships_array = changed_relationships.map do |k, v| 
+        relationships_array = changed_relationships.map do |k, v|
           association_info = ENTITY_RELATIONSHIP.find { |param| param[:relationship_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
 
@@ -100,9 +99,11 @@ module Productive
       # Example: Productive::Project.find(399787)
       def find(id)
         raise ApiRequestError, 'Entity id is invalid.' if id.nil?
+
         entities = retrieve_entities_from_api("#{path}/#{id}")
 
         return nil if entities.empty?
+
         entities.first
       end
 
@@ -120,7 +121,7 @@ module Productive
       include SharedMethods
 
       def new?
-        !self.respond_to?(:id)
+        !respond_to?(:id)
       end
 
       # TODO: need to validate the required uri parameters
@@ -147,6 +148,7 @@ module Productive
         entities = Parser.handle_response(response, self)
 
         return nil if entities.empty?
+
         entities.first
       end
 

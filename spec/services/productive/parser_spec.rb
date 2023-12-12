@@ -10,7 +10,8 @@ RSpec.describe Productive::Parser, type: :request do
       association_info = JSON.parse(association_data)
       attributes = Productive::Parser.parse_attributes(data_hash, association_info)
 
-      expect(attributes).to eq({"name"=>"Update project", "number"=>"1", "project_number"=>"1", "project_type_id"=>1, "project_color_id"=>9, "last_activity_at"=>"2023-12-05T05:40:54.000+01:00", "public_access"=>true, "time_on_tasks"=>false, "tag_colors"=>{}, "archived_at"=>nil, "created_at"=>"2023-11-28T01:04:43.344+01:00", "template"=>false, "needs_invoicing"=>false, "sample_data"=>true, "id"=>"399787", "organization_id"=>"31810", "company_id"=>"699398", "project_manager_id"=>"561888", "last_actor_id"=>"561886", "workflow_id"=>"32544", "membership_ids"=>["6368022", "6368023", "6368024", "6450128"]})
+      expect(attributes).to eq({ 'name' => 'Update project', 'number' => '1', 'project_number' => '1', 'project_type_id' => 1,
+                                 'project_color_id' => 9, 'last_activity_at' => '2023-12-05T05:40:54.000+01:00', 'public_access' => true, 'time_on_tasks' => false, 'tag_colors' => {}, 'archived_at' => nil, 'created_at' => '2023-11-28T01:04:43.344+01:00', 'template' => false, 'needs_invoicing' => false, 'sample_data' => true, 'id' => '399787', 'organization_id' => '31810', 'company_id' => '699398', 'project_manager_id' => '561888', 'last_actor_id' => '561886', 'workflow_id' => '32544', 'membership_ids' => %w[6368022 6368023 6368024 6450128] })
     end
   end
 
@@ -21,11 +22,11 @@ RSpec.describe Productive::Parser, type: :request do
       it 'parses the association info from the response' do
         data_hash = JSON.parse(data)
         association_info = Productive::Parser.parse_associations_info(data_hash)
-        
-        expect(association_info['organization']).to eq("31810") 
-        expect(association_info['company']).to eq("699398") 
-        expect(association_info['workflow']).to eq("32544") 
-        expect(association_info['memberships']).to eq(["6368022", "6368023", "6368024", "6450128"]) 
+
+        expect(association_info['organization']).to eq('31810')
+        expect(association_info['company']).to eq('699398')
+        expect(association_info['workflow']).to eq('32544')
+        expect(association_info['memberships']).to eq(%w[6368022 6368023 6368024 6450128])
       end
     end
 
@@ -35,8 +36,8 @@ RSpec.describe Productive::Parser, type: :request do
       it 'parses the association info from the response' do
         data_hash = JSON.parse(data)
         association_info = Productive::Parser.parse_associations_info(data_hash)
-        
-        expect(association_info).not_to have_key("last_actor") 
+
+        expect(association_info).not_to have_key('last_actor')
       end
     end
 
@@ -46,8 +47,8 @@ RSpec.describe Productive::Parser, type: :request do
       it 'parses the association info from the response' do
         data_hash = JSON.parse(data)
         association_info = Productive::Parser.parse_associations_info(data_hash)
-        
-        expect(association_info).not_to have_key("memberships") 
+
+        expect(association_info).not_to have_key('memberships')
       end
     end
   end

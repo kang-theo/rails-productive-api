@@ -16,7 +16,10 @@ module Productive
       @changed_attrs = {}
       @changed_relationships = {}
 
-      attributes.merge!({ name: "", project_type_id: nil, project_manager_id: "", company_id: "", workflow_id: "" }) if attributes.empty?
+      if attributes.empty?
+        attributes.merge!({ name: '', project_type_id: nil, project_manager_id: '', company_id: '',
+                            workflow_id: '' })
+      end
       create_accessors(attributes)
       define_associations(association_info) if association_info.present?
     end
@@ -30,13 +33,13 @@ module Productive
 
     # customize the output of the object
     def inspect
-      attributes_to_exclude = [:@changed_attrs, :@changed_relationships, :@changes]
+      attributes_to_exclude = %i[@changed_attrs @changed_relationships @changes]
       filtered_instance_variables = instance_variables.reject do |var|
         attributes_to_exclude.include?(var.to_sym)
       end
 
       filtered_attributes = filtered_instance_variables.each_with_object({}) do |var, hash|
-        hash[var.to_s.delete("@")] = instance_variable_get(var)
+        hash[var.to_s.delete('@')] = instance_variable_get(var)
       end
 
       "#<#{self.class}:#{object_id} #{filtered_attributes}>"
@@ -51,7 +54,7 @@ module Productive
 
         class_eval do
           define_method(key) { instance_variable_get("@#{key}") }
-          define_method("#{key}=") do |value| 
+          define_method("#{key}=") do |value|
             track_change("#{key}".to_sym, send("#{key}"), value)
             instance_variable_set("@#{key}", value)
           end
