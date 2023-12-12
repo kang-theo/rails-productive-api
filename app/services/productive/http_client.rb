@@ -27,23 +27,27 @@ module Productive
       end
     end
 
+    # TODO: be careful if the post is triggered by others. version or reload periodically.
     def self.post(req_params = {}, payload = {})
       # delete cache after post
       refresh_cache(req_params)
 
-      HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      response = HTTParty.post("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
     end
 
     def self.patch(req_params = {}, payload = {})
       refresh_cache(req_params)
 
-      HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      response = HTTParty.patch("#{@@endpoint}/#{req_params}", body: payload, headers: @@headers)
+      OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
     end
 
     def self.delete(req_params)
       refresh_cache(req_params)
 
-      HTTParty.delete("#{@@endpoint}/#{req_params}", headers: @@headers)
+      response = HTTParty.delete("#{@@endpoint}/#{req_params}", headers: @@headers)
+      OpenStruct.new({"code"=>response.code, "body"=>JSON.parse(response.body)})
     end
 
     private

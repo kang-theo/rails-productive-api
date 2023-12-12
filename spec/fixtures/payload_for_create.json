@@ -1,0 +1,23 @@
+{
+  "data": {
+    "type": "projects",
+    "attributes": {
+      "project_type_id": 1,
+      "project_manager_id": "561888"
+    },
+    "relationships": {
+      "company": {
+        "data": {
+          "type": "companies",
+          "id": "699400"
+        }
+      },
+      "workflow": {
+        "data": {
+          "type": "workflows",
+          "id": "32544"
+        }
+      }
+    }
+  }
+}

@@ -141,6 +141,7 @@ RSpec.describe Productive::Project, type: :model do
 
       let(:response_update) do
         one_project = File.read('./spec/fixtures/update_project.yaml')
+        # to Hash
         OpenStruct.new(YAML.safe_load(one_project))
       end
 
