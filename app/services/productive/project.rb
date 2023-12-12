@@ -53,7 +53,7 @@ module Productive
       # Example:
       #   p = Productive::Project.copy({name: "copied 1", template_id: "399787"})
       def self.copy(attrs)
-        response = HttpClient.post("#{path}/copy", build_payload(attrs))
+        response = HttpClient.post("#{path}/copy", payload(attrs))
         Parser.handle_response(response, self)
       end
   end

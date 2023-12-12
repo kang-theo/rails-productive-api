@@ -5,22 +5,16 @@ module Productive
     include Common
     include Parser
 
-    # TODO: can be defined in class directly
-    def changes
-      @changes ||= {}
-    end
-    
-    def changed_attrs
-      @changed_attrs ||= {}
-    end
-
-    def changed_relationships
-      @changed_relationships ||= {}
-    end
+    # process attributes and associations change
+    attr_accessor :changes, :changed_attrs, :changed_relationships
 
     # TODO: set required attributes when creating an instance
     def initialize(attributes = {}, association_info = {})
       # raise 'ApiRequestError: attributes is blank' if attributes.blank?
+
+      @changes = {}
+      @changed_attrs = {}
+      @changed_relationships = {}
 
       attributes.merge!({ name: "", project_type_id: nil, project_manager_id: "", company_id: "", workflow_id: "" }) if attributes.empty?
       create_accessors(attributes)
@@ -81,6 +75,10 @@ module Productive
           define_method(key.to_sym) { ids.map { |id| klass.find(id) } }
         end
       end
+    end
+
+    def track_change(attr, old_value, new_value)
+      changes[attr] = new_value if old_value != new_value
     end
   end
 end

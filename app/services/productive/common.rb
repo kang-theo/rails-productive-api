@@ -41,19 +41,7 @@ module Productive
         !attr.start_with?("project") && (attr.end_with?("_id") || attr.end_with?("_ids"))
       end
 
-      # move to Base
-      def track_change(attr, old_value, new_value)
-        changes
-        @changes[attr] = new_value if old_value != new_value
-      end
-
-      # TODO: change to payload
-      def build_payload
-        # TODO: define when you use it, it is not correct in OOP, the correct logic should be:
-        # TODO: you already have when you use it, this can be instance variables.
-        changed_attrs
-        changed_relationships
-
+      def payload
         changes.each do |k, v|
           foreign_key?(k) ? changed_relationships[k] = v : changed_attrs[k] = v
         end
@@ -71,14 +59,13 @@ module Productive
         # relationships are optional
         return payload.to_json if changed_relationships.blank?
 
-        relationships_hash = build_relationships
+        relationships_hash = relationships
         payload[:data][:relationships] = relationships_hash
 
         payload.to_json
       end
 
-      # TODO: this method returns the constructed relationships, so the method name can be "relationships, do not need the build verb"
-      def build_relationships
+      def relationships
         relationships_array = changed_relationships.map do |k, v| 
           association_info = ENTITY_RELATIONSHIP.find { |param| param[:relationship_id] == k.to_s }
           raise ApiRequestError if association_info.nil?
@@ -168,9 +155,9 @@ module Productive
       def handle_request
         case new? ? :create : :update
         when :create
-          HttpClient.post("#{path}", build_payload)
+          HttpClient.post("#{path}", payload)
         when :update
-          HttpClient.patch("#{path}/#{id}", build_payload)
+          HttpClient.patch("#{path}/#{id}", payload)
         else
           raise ApiRequestError, 'Undefined action.'
         end
