@@ -39,7 +39,7 @@ RSpec.describe Productive::HttpClient, type: :request do
 
       it 'not found with invalid request params' do
         stub_request(:get, %r{#{Regexp.quote(endpoint)}/.*})
-          .with(body: payload, headers: headers)
+          .with(headers: headers)
           .to_return(status: 400, body: not_found, headers: {'Content-Type' => 'application/vnd.api+json; charset=utf-8' })
 
         response = Productive::HttpClient.get("#{endpoint}/bad/path")
@@ -112,33 +112,20 @@ RSpec.describe Productive::HttpClient, type: :request do
   #   end
   # end
 
-  # describe '.parse_response' do
-  #   context 'when the block execution is successful' do
-  #     let(:data){ File.read('./spec/fixtures/response.json') }
+  describe '.parse_response' do
+    let(:valid_data){ File.read('./spec/fixtures/response.json') }
+    let(:invalid_data){ File.read('./spec/fixtures/response.xml') }
 
-  #     it 'does not raise an error' do
-  #       expect do
-  #         Productive::Parser.parse_response do
-  #           JSON.parse(data).dig('data')
-  #         end
-  #       end.to_not raise_error
-  #     end
-  #   end
+    it 'valid response format, does not raise an error' do
+      expect do
+        Productive::HttpClient.parse_response { JSON.parse(valid_data) }
+      end.to_not raise_error
+    end
 
-  #   context 'when the block execution raises JSON::ParserError' do
-  #     let(:data) { File.read('./spec/fixtures/response.xml') } 
-
-  #     it 'rescues the error and logs it' do
-  #       allow(Rails.logger).to receive(:error)
-
-  #       response_data = Productive::Parser.parse_response do
-  #         JSON.parse(data).dig('data')
-  #       end
-
-  #       # TODO: process exception instantly, logger and find it after a long time is not a good idea. The jason respon is also not a normal way.
-  #       expect(Rails.logger).to have_received(:error).with(/JSON::ParserError: unexpected token/)
-  #       expect(response_data).to eq({ error: 'JSON::ParserError', status: :bad_response })
-  #     end
-  #   end
-  # end
+    it 'invalid response format, raise an exception' do
+      expect do 
+        Productive::HttpClient.parse_response { JSON.parse(invalid_data) }
+      end.to raise_error(ApiResponseError, /Invalid JSON response from API/)
+    end
+  end
 end
