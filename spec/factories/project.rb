@@ -65,19 +65,10 @@ FactoryBot.define do
       number: Faker::Number.unique.number(digits: 2),
       project_number: Faker::Number.unique.number(digits: 2),
       project_type_id: Faker::Number.unique.number(digits: 1),
-      project_color_id: nil,
       last_activity_at: Faker::Time.between(from: DateTime.now - 30, to: DateTime.now),
       public_access: Faker::Boolean.boolean,
-      time_on_tasks: Faker::Boolean.boolean,
-      tag_colors: {},
-      archived_at: nil,
       created_at: Faker::Time.between(from: DateTime.now - 30, to: DateTime.now),
-      template: Faker::Boolean.boolean,
-      budget_closing_date: nil,
-      needs_invoicing: Faker::Boolean.boolean,
-      custom_fields: nil,
-      task_custom_fields_ids: nil,
-      sample_data: Faker::Boolean.boolean,
+      archived_at: nil,
       organization_id: Faker::Number.unique.number(digits: 5),
       company_id: Faker::Number.unique.number(digits: 6),
       project_manager_id: Faker::Number.unique.number(digits: 6),
@@ -86,6 +77,7 @@ FactoryBot.define do
       membership_ids: [Faker::Number.unique.number(digits: 7).to_s, Faker::Number.unique.number(digits: 7).to_s]
     }
 
+    # use specified constructor
     initialize_with { new(attributes) }
 
     trait :with_archived_at do
