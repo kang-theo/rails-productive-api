@@ -1,10 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Productive::ResponseHandler, type: :request do
-  describe '.parse_attributes' do
+  describe '#parse_attributes' do
     let(:data) { File.read('./spec/fixtures/normal_response_data.json') }
     let(:association_data) { File.read('./spec/fixtures/association_data.json') }
-    let(:entity_class) { Productive::Project }
 
     it 'parse attributes from response' do
       data_hash = JSON.parse(data)
@@ -19,7 +18,7 @@ RSpec.describe Productive::ResponseHandler, type: :request do
     end
   end
 
-  describe '.parse_associations_info' do
+  describe '#parse_associations_info' do
     context 'data with valid relationships' do
       let(:data) { File.read('./spec/fixtures/normal_response_data.json') }
 
@@ -58,6 +57,31 @@ RSpec.describe Productive::ResponseHandler, type: :request do
 
         expect(handler.association_info).not_to have_key('memberships')
       end
+    end
+  end
+
+  describe '#compute' do
+    let(:response) { OpenStruct.new(JSON.parse(File.read('./spec/fixtures/response_with_code.json'))) }
+    let(:association_data) { JSON.parse(File.read('./spec/fixtures/association_data.json')) }
+    let(:attributes_data) { JSON.parse(File.read('./spec/fixtures/attributes_data.json')) }
+    let(:entity_class) { Productive::Project }
+
+    it 'parses response and creates entities' do
+      # stub instance method and run blocks to set attributes and association_info which should be done by the stubbed methods
+      allow_any_instance_of(Productive::ResponseHandler).to receive(:parse_associations_info) do |instance|
+        instance.instance_variable_set(:@association_info, instance.instance_variable_get(:@association_info).merge(association_data))
+      end
+
+      allow_any_instance_of(Productive::ResponseHandler).to receive(:parse_attributes) do |instance|
+        # instance.instance_variable_set(:@attributes, instance.instance_variable_get(:@attributes).merge(attributes_data))
+        instance.instance_variable_set(:@attributes, instance.instance_variable_get(:@attributes).merge(attributes_data))
+      end
+
+      handler = Productive::ResponseHandler.new(nil, response, entity_class)
+
+      result = handler.compute
+      
+      expect(result).to all(be_an_instance_of(entity_class))
     end
   end
 end

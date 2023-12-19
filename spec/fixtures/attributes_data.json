@@ -1,0 +1,29 @@
+{
+  "name": "Internal project [SAMPLE]",
+  "number": "1",
+  "project_number": "1",
+  "project_type_id": 1,
+  "project_color_id": null,
+  "last_activity_at": "2023-12-14T07:47:33.000+01:00",
+  "public_access": true,
+  "time_on_tasks": false,
+  "tag_colors": {},
+  "archived_at": null,
+  "created_at": "2023-12-14T07:47:26.241+01:00",
+  "template": false,
+  "budget_closing_date": null,
+  "needs_invoicing": false,
+  "custom_fields": null,
+  "task_custom_fields_ids": null,
+  "sample_data": true,
+  "id": "407433",
+  "organization_id": "32232",
+  "company_id": "709967",
+  "project_manager_id": "578180",
+  "workflow_id": "33005",
+  "membership_ids": [
+    "6545317",
+    "6545318",
+    "6545319"
+  ]
+}

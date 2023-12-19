@@ -10,7 +10,7 @@ module Productive
 
   # refactor: replace method with method object
   class ResponseHandler
-    attr_accessor :parser, :response, :entity_class, :data, :attributes, :association_info
+    attr_accessor :parser, :response, :entity_class, :attributes, :association_info
 
     def initialize(parser, response, entity_class)
       @parser = parser

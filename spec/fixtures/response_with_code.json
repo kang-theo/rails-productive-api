@@ -1,0 +1,36 @@
+{
+  "code": 200,
+  "body":{
+    "data": {
+      "id": 399787,
+      "type": "projects",
+      "attributes": {
+        "name": "Update project",
+        "number": 1,
+        "project_number": 1,
+        "project_type_id": 1,
+        "project_color_id": 9
+      },
+      "relationships": {
+        "organization": {
+          "data": {
+            "type": "organizations",
+            "id": 31810
+          }
+        },
+        "workflow": {
+          "data": {
+            "type": "workflows",
+            "id": 32544
+          }
+        },
+        "memberships": {
+          "data": {
+            "type": "memberships",
+            "id": 6368022
+          }
+        }
+      }
+    }
+  }
+}
