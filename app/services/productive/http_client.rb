@@ -60,11 +60,11 @@ module Productive
     end
 
     def self.parse_response
-begin
-      yield
-    rescue JSON::ParserError => e
-      raise ApiResponseError, "Invalid JSON response from API: #{e.message}"
+      begin
+        yield
+      rescue JSON::ParserError => e
+        raise ApiResponseError, "Invalid JSON response from API: #{e.message}"
+      end
     end
   end
-end
 end
